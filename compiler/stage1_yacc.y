@@ -36,10 +36,10 @@
                     ;
 
 
-    E       :         E '+' E         {$$ = makeOperatorNode('+', $1, $3);}
-                    | E '-' E         {$$ = makeOperatorNode('-', $1, $3);}
-                    | E '*' E         {$$ = makeOperatorNode('*', $1, $3);}
-                    | E '/' E         {$$ = makeOperatorNode('/', $1, $3);}
+    E       :         '+' E E         {$$ = makeOperatorNode('+', $2, $3);}
+                    | '-' E E         {$$ = makeOperatorNode('-', $2, $3);}
+                    | '*' E E         {$$ = makeOperatorNode('*', $2, $3);}
+                    | '/' E E         {$$ = makeOperatorNode('/', $2, $3);}
                     | '(' E ')'     {$$ = $2;}
                     | NUM           {$$ = $1;}
                     ;
