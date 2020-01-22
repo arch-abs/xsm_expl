@@ -17,7 +17,9 @@
 
 %%
 
-[0-9]+   {
+[ |\t]*  /*Eat up white space(new line excluded)*/
+
+[0-9]+  {
             number = atoi(yytext);
             yylval.root = makeLeafNode(number);
             return NUM;
