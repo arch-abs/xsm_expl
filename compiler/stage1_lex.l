@@ -23,7 +23,7 @@
             return NUM;
         }
 
-[\+ | \( | \)]  {
+[\+ | \- | \* | \/ | \( | \)]  {
                     return *yytext;
                     //yylval = NULL;
                 }

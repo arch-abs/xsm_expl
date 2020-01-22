@@ -17,7 +17,8 @@
 
 
 %token NUM END
-%left '+'
+%left '+' '-'
+%left '*' '/'
 
 
 
@@ -35,7 +36,10 @@
                     ;
 
 
-    E       :       E '+' E         {$$ = makeOperatorNode('+', $1, $3);}
+    E       :         E '+' E         {$$ = makeOperatorNode('+', $1, $3);}
+                    | E '-' E         {$$ = makeOperatorNode('-', $1, $3);}
+                    | E '*' E         {$$ = makeOperatorNode('*', $1, $3);}
+                    | E '/' E         {$$ = makeOperatorNode('/', $1, $3);}
                     | '(' E ')'     {$$ = $2;}
                     | NUM           {$$ = $1;}
                     ;

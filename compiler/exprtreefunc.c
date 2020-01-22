@@ -27,7 +27,16 @@ int evaluate(node root){
         return root->val;
 
     switch(*(root->op)){
+        
         case '+'    :   return evaluate(root->left) + evaluate(root->right);
+                        break;
+        case '-'    :   return evaluate(root->left) - evaluate(root->right);
+                        break;
+        case '*'    :   return evaluate(root->left) * evaluate(root->right);
+                        break;
+        case '/'    :   return evaluate(root->left) / evaluate(root->right);
+                        break;
+        default     :   printf("ERROR in evaluate expr switchcase\n");
                         break;
     }
 }
