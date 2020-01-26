@@ -14,3 +14,4 @@ int evaluate(node root);
 void callPrefixPrint(node root);
 void callPostfixPrint(node root);
 int codeGenAuxillary(node root, FILE* fw);
+int codeGen(node root);
