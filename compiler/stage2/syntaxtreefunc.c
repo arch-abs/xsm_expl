@@ -1,5 +1,5 @@
 // MIGHT NEED TO INCLUDE exprtreedecl.h here
-//#include "syntaxtreedecl.h"
+// #include "syntaxtreedecl.h"
 #include "y.tab.h"
 
 int regCount = 0;               //might need to change this to array based in future
@@ -336,9 +336,6 @@ int codeGen(node root){
 
 
 
-
-
-//4121
 int codeGenAuxillary(node root, FILE* fw){                     //written in pre-order form so, l will bw lower and r will be greater REG
     int l, r, reg;
     char c;
@@ -504,6 +501,113 @@ int codeGenAuxillary(node root, FILE* fw){                     //written in pre-
 
         default:
             printf("ERROR....!!! In codeGenAuxillary() switch case...\n");
+            break;
+
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+int vars[26];
+int codeEvaluator(node root){                     //written in pre-order form so, l will bw lower and r will be greater REG
+    int l, r, reg;
+    char c;
+
+    switch(root->nodetype){
+        case NUM:
+            return root->val;
+            break;
+        
+        case ID:
+            // reg = getFreeReg();
+            // fprintf(fw, "MOV R%d, %d\n", reg, ((*(root->varname)) - 'a' + 4096) );
+            return *(root->varname);
+            break;
+
+        case ARITHOP:
+            l = codeEvaluator(root->left);
+            r = codeEvaluator(root->right);
+            if(root->left->nodetype == ID){
+                l = vars[l - 'a'];
+            }
+            if(root->right->nodetype == ID){
+                r = vars[r - 'a'];
+            }
+
+            c = (root->val);
+            switch (c)
+            {
+                case '+':
+                    return l+r;
+                    break;
+                case '-':
+                    return l-r;
+                    break;
+                case '*':
+                    return l*r;
+                    break;
+                case '/':
+                    return l/r;
+                    break;
+                default:
+                    printf("Error!!!! in codeEvaluator op switch case\n");
+                    //close the file pointer;
+                    exit(0);
+                    break;
+            }
+            freeReg();
+            return l;
+            break;
+
+        case ASSGNOP:
+            l = codeEvaluator(root->left);
+            r = codeEvaluator(root->right);
+
+            if(root->right->nodetype == ID){
+                r = vars[r - 'a'];
+            }
+
+            vars[l-'a'] = r;
+            return l;       //returning l arbirarily as no use of it
+            break;
+        
+        case READ:
+            l = codeEvaluator(root->left);
+
+            scanf("%d", (vars + (l-'a')));
+            return l;       //returning l arbirarily as no use of it
+            break;
+
+        case WRITE:
+            l = codeEvaluator(root->left);
+
+            if(root->left->nodetype == ID){
+                l = vars[l - 'a'];
+            }
+  
+
+            printf("%d\n", l);
+            return l;       //returning l arbirarily as no use of it
+            break;
+
+
+        case CONNECTOR:
+            l = codeEvaluator(root->left);
+            r = codeEvaluator(root->right);
+
+            return l;       //returning l arbirarily as no use of it
+            break;
+
+        default:
+            printf("ERROR....!!! In codeEvaluator switch case...\n");
             break;
 
     }

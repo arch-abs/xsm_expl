@@ -35,7 +35,8 @@
                                            
                                             printf(">>Parsed<<!!!\n");
                                             
-                                            codeGen($2);
+                                            //codeGen($2);
+                                            codeEvaluator($2);
                                             $$ = $2;
 
                                             //some more things to check O/P

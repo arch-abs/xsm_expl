@@ -39,4 +39,6 @@ typedef struct tnode* node;
 int codeGenAuxillary(node root, FILE* fw);
 int codeGen(node root);
 
+int codeEvaluator(node root);
+
 node createTree(int val, int type, char* varname, int nodetype, node left, node right);

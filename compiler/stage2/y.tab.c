@@ -449,8 +449,8 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    31,    31,    43,    55,    56,    59,    60,    61,    64,
-      67,    70,    74,    75,    76,    77,    78,    79,    80
+       0,    31,    31,    44,    56,    57,    60,    61,    62,    65,
+      68,    71,    75,    76,    77,    78,    79,    80,    81
 };
 #endif
 
@@ -1248,16 +1248,17 @@ yyreduce:
                                            
                                             printf(">>Parsed<<!!!\n");
                                             
-                                            codeGen((yyvsp[-2].root));
+                                            //codeGen($2);
+                                            codeEvaluator((yyvsp[-2].root));
                                             (yyval.root) = (yyvsp[-2].root);
 
                                             //some more things to check O/P
                                         }
-#line 1257 "y.tab.c" /* yacc.c:1646  */
+#line 1258 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 43 "stage2_yacc.y" /* yacc.c:1646  */
+#line 44 "stage2_yacc.y" /* yacc.c:1646  */
     {
                                         // callPrefixPrint($1);
                                         // callPostfixPrint($1);
@@ -1268,101 +1269,101 @@ yyreduce:
                                         (yyval.root) = NULL;
                                         //some more things to check O/P
                                     }
-#line 1272 "y.tab.c" /* yacc.c:1646  */
+#line 1273 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 55 "stage2_yacc.y" /* yacc.c:1646  */
+#line 56 "stage2_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree(-1, CONNECTOR, NULL, CONNECTOR, (yyvsp[-1].root), (yyvsp[0].root));}
-#line 1278 "y.tab.c" /* yacc.c:1646  */
+#line 1279 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 56 "stage2_yacc.y" /* yacc.c:1646  */
+#line 57 "stage2_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = (yyvsp[0].root);}
-#line 1284 "y.tab.c" /* yacc.c:1646  */
+#line 1285 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 59 "stage2_yacc.y" /* yacc.c:1646  */
+#line 60 "stage2_yacc.y" /* yacc.c:1646  */
     {(yyval.root)=(yyvsp[0].root);}
-#line 1290 "y.tab.c" /* yacc.c:1646  */
+#line 1291 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 60 "stage2_yacc.y" /* yacc.c:1646  */
+#line 61 "stage2_yacc.y" /* yacc.c:1646  */
     {(yyval.root)=(yyvsp[0].root);}
-#line 1296 "y.tab.c" /* yacc.c:1646  */
+#line 1297 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 61 "stage2_yacc.y" /* yacc.c:1646  */
+#line 62 "stage2_yacc.y" /* yacc.c:1646  */
     {(yyval.root)=(yyvsp[0].root);}
-#line 1302 "y.tab.c" /* yacc.c:1646  */
+#line 1303 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 64 "stage2_yacc.y" /* yacc.c:1646  */
+#line 65 "stage2_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree(-1, READ, NULL, READ, (yyvsp[-2].root), NULL);}
-#line 1308 "y.tab.c" /* yacc.c:1646  */
+#line 1309 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 67 "stage2_yacc.y" /* yacc.c:1646  */
+#line 68 "stage2_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree(-1, WRITE, NULL, WRITE, (yyvsp[-2].root), NULL);}
-#line 1314 "y.tab.c" /* yacc.c:1646  */
+#line 1315 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 70 "stage2_yacc.y" /* yacc.c:1646  */
+#line 71 "stage2_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree('=', '=', NULL, ASSGNOP, (yyvsp[-3].root), (yyvsp[-1].root));}
-#line 1320 "y.tab.c" /* yacc.c:1646  */
+#line 1321 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 74 "stage2_yacc.y" /* yacc.c:1646  */
+#line 75 "stage2_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree('+', '+', NULL, ARITHOP, (yyvsp[-2].root), (yyvsp[0].root));}
-#line 1326 "y.tab.c" /* yacc.c:1646  */
+#line 1327 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 75 "stage2_yacc.y" /* yacc.c:1646  */
+#line 76 "stage2_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree('-', '-', NULL, ARITHOP, (yyvsp[-2].root), (yyvsp[0].root));}
-#line 1332 "y.tab.c" /* yacc.c:1646  */
+#line 1333 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 76 "stage2_yacc.y" /* yacc.c:1646  */
+#line 77 "stage2_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree('*', '*', NULL, ARITHOP, (yyvsp[-2].root), (yyvsp[0].root));}
-#line 1338 "y.tab.c" /* yacc.c:1646  */
+#line 1339 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 77 "stage2_yacc.y" /* yacc.c:1646  */
+#line 78 "stage2_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree('/', '/', NULL, ARITHOP, (yyvsp[-2].root), (yyvsp[0].root));}
-#line 1344 "y.tab.c" /* yacc.c:1646  */
+#line 1345 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 78 "stage2_yacc.y" /* yacc.c:1646  */
+#line 79 "stage2_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = (yyvsp[-1].root);}
-#line 1350 "y.tab.c" /* yacc.c:1646  */
+#line 1351 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 79 "stage2_yacc.y" /* yacc.c:1646  */
+#line 80 "stage2_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = (yyvsp[0].root);}
-#line 1356 "y.tab.c" /* yacc.c:1646  */
+#line 1357 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 80 "stage2_yacc.y" /* yacc.c:1646  */
+#line 81 "stage2_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = (yyvsp[0].root);}
-#line 1362 "y.tab.c" /* yacc.c:1646  */
+#line 1363 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1366 "y.tab.c" /* yacc.c:1646  */
+#line 1367 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1590,7 +1591,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 82 "stage2_yacc.y" /* yacc.c:1906  */
+#line 83 "stage2_yacc.y" /* yacc.c:1906  */
 
 
 
