@@ -359,59 +359,29 @@ int codeGenAuxillary(node root, FILE* fw){                     //written in pre-
         case ARITHOP:
             l = codeGenAuxillary(root->left, fw);
             r = codeGenAuxillary(root->right, fw);
+            if(root->left->nodetype == ID){
+                reg = getFreeReg();
+                fprintf(fw, "MOV R%d, [%d]\n", reg, (l -'a' + 4096));
+                l = reg;
+            }
+            if(root->right->nodetype == ID){
+                reg = getFreeReg();
+                fprintf(fw, "MOV R%d, [%d]\n", reg, (r -'a' + 4096));
+                r = reg;
+            }
             c = (root->val);
             switch (c)
             {
                 case '+':
-                    if(root->left->nodetype == ID){
-                        reg = getFreeReg();
-                        fprintf(fw, "MOV R%d, [%d]\n", reg, (l -'a' + 4096));
-                        l = reg;
-                    }
-                    if(root->right->nodetype == ID){
-                        reg = getFreeReg();
-                        fprintf(fw, "MOV R%d, [%d]\n", reg, (r -'a' + 4096));
-                        r = reg;
-                    }
                     fprintf(fw, "ADD R%d, R%d\n", l, r);
                     break;
                 case '-':
-                    if(root->left->nodetype == ID){
-                        reg = getFreeReg();
-                        fprintf(fw, "MOV R%d, [%d]\n", reg, (l -'a' + 4096));
-                        l = reg;
-                    }
-                    if(root->right->nodetype == ID){
-                        reg = getFreeReg();
-                        fprintf(fw, "MOV R%d, [%d]\n", reg, (r -'a' + 4096));
-                        r = reg;
-                    }
                     fprintf(fw, "SUB R%d, R%d\n", l, r);
                     break;
                 case '*':
-                    if(root->left->nodetype == ID){
-                        reg = getFreeReg();
-                        fprintf(fw, "MOV R%d, [%d]\n", reg, (l -'a' + 4096));
-                        l = reg;
-                    }
-                    if(root->right->nodetype == ID){
-                        reg = getFreeReg();
-                        fprintf(fw, "MOV R%d, [%d]\n", reg, (r -'a' + 4096));
-                        r = reg;
-                    }
                     fprintf(fw, "MUL R%d, R%d\n", l, r);
                     break;
                 case '/':
-                    if(root->left->nodetype == ID){
-                        reg = getFreeReg();
-                        fprintf(fw, "MOV R%d, [%d]\n", reg, (l -'a' + 4096));
-                        l = reg;
-                    }
-                    if(root->right->nodetype == ID){
-                        reg = getFreeReg();
-                        fprintf(fw, "MOV R%d, [%d]\n", reg, (r -'a' + 4096));
-                        r = reg;
-                    }
                     fprintf(fw, "DIV R%d, R%d\n", l, r);
                     break;
                 default:
