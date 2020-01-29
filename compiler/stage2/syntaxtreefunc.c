@@ -52,7 +52,7 @@ node createTree(int val, int type, char* varname, int nodetype, node left, node 
 
         case ARITHOP:
             tmp->val = val;
-            tmp->type = type;
+            tmp->type = type;       //INTEGER upto now
             tmp->varname = NULL;
             tmp->nodetype = ARITHOP;
             tmp->left = left;

@@ -5,7 +5,11 @@ begin
     read(c );
     read(d);
     a = b+2*d/b;
-    write(a);
+    if(a == 0) then
+        write(a);
+    else
+        while(a-1);
+    endif;
     write(b);
     write(c);
     write(d);

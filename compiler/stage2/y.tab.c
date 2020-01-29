@@ -1321,25 +1321,25 @@ yyreduce:
 
   case 12:
 #line 74 "stage2_yacc.y" /* yacc.c:1646  */
-    {(yyval.root) = createTree('+', '+', NULL, ARITHOP, (yyvsp[-2].root), (yyvsp[0].root));}
+    {(yyval.root) = createTree('+', '+', INTEGER, ARITHOP, (yyvsp[-2].root), (yyvsp[0].root));}
 #line 1326 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
 #line 75 "stage2_yacc.y" /* yacc.c:1646  */
-    {(yyval.root) = createTree('-', '-', NULL, ARITHOP, (yyvsp[-2].root), (yyvsp[0].root));}
+    {(yyval.root) = createTree('-', '-', INTEGER, ARITHOP, (yyvsp[-2].root), (yyvsp[0].root));}
 #line 1332 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
 #line 76 "stage2_yacc.y" /* yacc.c:1646  */
-    {(yyval.root) = createTree('*', '*', NULL, ARITHOP, (yyvsp[-2].root), (yyvsp[0].root));}
+    {(yyval.root) = createTree('*', '*', INTEGER, ARITHOP, (yyvsp[-2].root), (yyvsp[0].root));}
 #line 1338 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
 #line 77 "stage2_yacc.y" /* yacc.c:1646  */
-    {(yyval.root) = createTree('/', '/', NULL, ARITHOP, (yyvsp[-2].root), (yyvsp[0].root));}
+    {(yyval.root) = createTree('/', '/', INTEGER, ARITHOP, (yyvsp[-2].root), (yyvsp[0].root));}
 #line 1344 "y.tab.c" /* yacc.c:1646  */
     break;
 

@@ -71,10 +71,10 @@
                     ;
 
 
-    E       :         E '+' E         {$$ = createTree('+', '+', NULL, ARITHOP, $1, $3);}
-                    | E '-' E         {$$ = createTree('-', '-', NULL, ARITHOP, $1, $3);}
-                    | E '*' E         {$$ = createTree('*', '*', NULL, ARITHOP, $1, $3);}
-                    | E '/' E         {$$ = createTree('/', '/', NULL, ARITHOP, $1, $3);}
+    E       :         E '+' E         {$$ = createTree('+', '+', INTEGER, ARITHOP, $1, $3);}
+                    | E '-' E         {$$ = createTree('-', '-', INTEGER, ARITHOP, $1, $3);}
+                    | E '*' E         {$$ = createTree('*', '*', INTEGER, ARITHOP, $1, $3);}
+                    | E '/' E         {$$ = createTree('/', '/', INTEGER, ARITHOP, $1, $3);}
                     | '(' E ')'       {$$ = $2;}
                     | NUM             {$$ = $1;}
                     | ID              {$$ = $1;}
