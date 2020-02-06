@@ -14,11 +14,11 @@
      struct tnode* root;
 }
 
-%type <root> NUM END E Program ID Slist Stmt InputStmt OutputStmt AssgStmt Ifstmt Whilestmt
-%type <root> IF then Else ENDIF WHILE DO ENDWHILE '+' '-' '*' '/' LT GT LE GE EQ NE
+%type <root> NUM END E Program ID Slist Stmt InputStmt OutputStmt AssgStmt Ifstmt Whilestmt BreakStmt ContinueStmt
+%type <root> IF then Else ENDIF WHILE DO ENDWHILE '+' '-' '*' '/' LT GT LE GE EQ NE BREAK CONT
 
 
-%token NUM END _BEGIN READ WRITE ID IF then Else ENDIF WHILE DO ENDWHILE LT GT LE GE EQ NE
+%token NUM END _BEGIN READ WRITE ID IF then Else ENDIF WHILE DO ENDWHILE LT GT LE GE EQ NE BREAK CONT
 
 
 %left NE
@@ -67,8 +67,10 @@
     Stmt    :       InputStmt       {$$=$1;}
                     | OutputStmt    {$$=$1;}
                     | AssgStmt      {$$=$1;}
-                    | Ifstmt
-                    |Whilestmt
+                    | Ifstmt        {$$=$1;}
+                    |Whilestmt      {$$=$1;}
+                    |BreakStmt      {$$=$1;}
+                    |ContinueStmt   {$$=$1;}
                     ;
 
     InputStmt:      READ '(' ID ')' ';'         {$$ = createTree(-1, READ, NULL, READ, $3, NULL);}
@@ -86,6 +88,10 @@
 
     Whilestmt   :   WHILE '(' E ')' DO Slist ENDWHILE ';'           {$$ = createTree(-1, WHILE, NULL, WHILE, $3, $6);}
                 ;
+
+    BreakStmt   :   BREAK ';'                   {$$ = createTree(-1, BREAK, NULL, BREAK, NULL, NULL);}
+
+    ContinueStmt:   CONT ';'                    {$$ = createTree(-1, CONT, NULL, CONT, NULL, NULL);}
 
 
     E       :         E '+' E         {$$ = createTree('+', INTEGER, NULL, ARITHOP, $1, $3);}

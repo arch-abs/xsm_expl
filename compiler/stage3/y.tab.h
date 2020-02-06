@@ -63,7 +63,9 @@ extern int yydebug;
     LE = 273,
     GE = 274,
     EQ = 275,
-    NE = 276
+    NE = 276,
+    BREAK = 277,
+    CONT = 278
   };
 #endif
 /* Tokens.  */
@@ -86,6 +88,8 @@ extern int yydebug;
 #define GE 274
 #define EQ 275
 #define NE 276
+#define BREAK 277
+#define CONT 278
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -96,7 +100,7 @@ union YYSTYPE
 
      struct tnode* root;
 
-#line 100 "y.tab.h" /* yacc.c:1909  */
+#line 104 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

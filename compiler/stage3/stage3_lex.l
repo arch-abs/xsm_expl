@@ -82,6 +82,15 @@
             return ENDWHILE;
 }
 
+"break"  {
+            return BREAK;
+}
+
+"continue"  {
+            return CONT;
+}
+
+
 
 "<"     {
             return LT;

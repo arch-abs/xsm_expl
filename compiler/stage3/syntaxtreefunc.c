@@ -5,6 +5,21 @@
 int regCount = 0;               //might need to change this to array based in future
 int lblCount = -1;
 
+int loop_stack_count = -1;
+
+void pushLoop(){
+    loop_stack_count++;
+}
+
+void popLoop(){
+    if(loop_stack_count <= -1)
+        printf("ERR...!!! Loop stack count trying to over pop...\n");
+    else
+        loop_stack_count--;
+}
+
+int loop_stack[2][1000];        //0 is for entry point lbl & 1 is for exit pt label
+
 /*
 node makeLeafNode(int n){
     node tmp = (node)malloc(sizeof(struct tnode));
@@ -44,7 +59,7 @@ node createTree(int val, int type, char* varname, int nodetype, node left, node 
 
         case ID:
             tmp->val = -1;
-            (tmp->type) = ID;
+            (tmp->type) = INTEGER;              //<<<<<<<<<>>>>>>>>>>!!!!!!!!!! MAY NEED TO CHANGE LATER !!!!!!!!!!<<<<<<<<>>>>>>>>>
             *(tmp->varname) = *(varname);       //try removing dereferencing and see what happens
             tmp->nodetype = ID;
             tmp->left = NULL;
@@ -58,6 +73,11 @@ node createTree(int val, int type, char* varname, int nodetype, node left, node 
             tmp->nodetype = ARITHOP;
             tmp->left = left;
             tmp->right = right;
+
+            if(tmp->left->type != INTEGER  || tmp->right->type != INTEGER){          //TYPE_CHK
+                printf("TYPE_ERR..!!! ARITHOP expects type INTEGER on LHS and type INTEGER on RHS...\n");
+                exit(0);
+            }
             break;
 
         case RELOP:
@@ -67,6 +87,12 @@ node createTree(int val, int type, char* varname, int nodetype, node left, node 
             tmp->nodetype = RELOP;
             tmp->left = left;
             tmp->right = right;
+
+            if(tmp->left->type != INTEGER  || tmp->right->type != INTEGER){          //TYPE_CHK
+                printf("TYPE_ERR..!!! RELOP expects type INTEGER on LHS and type INTEGER on RHS...\n");
+                exit(0);
+            }
+            break;
             break;
 
         case ASSGNOP:
@@ -76,6 +102,11 @@ node createTree(int val, int type, char* varname, int nodetype, node left, node 
             tmp->nodetype = ASSGNOP;
             tmp->left = left;
             tmp->right = right;
+
+            if(tmp->left->type != INTEGER  || tmp->right->type != INTEGER){         //TYPE_CHK
+                printf("TYPE_ERR..!!! '=' expects ID of type INTEGER on LHS and INTEGER TYPE on RHS...\n");
+                exit(0);
+            }
             break;
 
         case READ:
@@ -103,6 +134,29 @@ node createTree(int val, int type, char* varname, int nodetype, node left, node 
             tmp->nodetype = WHILE;
             tmp->left = left;           //>>>>>>>!!!!!might need to put TYPE_CHK here<<<<<<<<!!!!!!!
             tmp->right = right;
+
+            if(tmp->left->type != BOOLEAN){      //TYPE_CHK
+                printf("TYPE_ERR..!!! while expects BOOLEAN found something else....!!!\n");
+                exit(0);
+            }
+            break;
+
+        case BREAK:
+            tmp->val = -1;
+            tmp->type = BREAK;
+            tmp->varname = NULL;
+            tmp->nodetype = BREAK;
+            tmp->left = NULL;
+            tmp->right = NULL;
+            break;
+
+        case CONT:
+            tmp->val = -1;
+            tmp->type = CONT;
+            tmp->varname = NULL;
+            tmp->nodetype = CONT;
+            tmp->left = NULL;
+            tmp->right = NULL;
             break;
 
         case IF:
@@ -112,6 +166,11 @@ node createTree(int val, int type, char* varname, int nodetype, node left, node 
             tmp->nodetype = IF;
             tmp->left = left;
             tmp->right = right;
+
+            if(tmp->left->type != BOOLEAN){      //TYPE_CHK
+                printf("TYPE_ERR..!!! if expects BOOLEAN found something else....!!!\n");
+                exit(0);
+            }
             break;
 
         case IFBODY:
@@ -401,12 +460,13 @@ int codeGenAuxillary(node root, FILE* fw){                     //written in pre-
 
         case ARITHOP:
             l = codeGenAuxillary(root->left, fw);
-            r = codeGenAuxillary(root->right, fw);
             if(root->left->nodetype == ID){
                 reg = getFreeReg();
                 fprintf(fw, "MOV R%d, [%d]\n", reg, (l -'a' + 4096));
                 l = reg;
             }
+
+            r = codeGenAuxillary(root->right, fw);
             if(root->right->nodetype == ID){
                 reg = getFreeReg();
                 fprintf(fw, "MOV R%d, [%d]\n", reg, (r -'a' + 4096));
@@ -416,6 +476,7 @@ int codeGenAuxillary(node root, FILE* fw){                     //written in pre-
             switch (c)
             {
                 case '+':
+                    //printf("lala...here_3\n");
                     fprintf(fw, "ADD R%d, R%d\n", l, r);
                     break;
                 case '-':
@@ -440,15 +501,17 @@ int codeGenAuxillary(node root, FILE* fw){                     //written in pre-
 
         case RELOP:
             l = codeGenAuxillary(root->left, fw);
-            r = codeGenAuxillary(root->right, fw);
             if(root->left->nodetype == ID){
                 reg = getFreeReg();
+                //printf("lala...here_1\n");
                 fprintf(fw, "MOV R%d, [%d]\n", reg, (l -'a' + 4096));
                 l = reg;
             }
+
+            r = codeGenAuxillary(root->right, fw);
             if(root->right->nodetype == ID){
-                printf("lala...here\n");
                 reg = getFreeReg();
+                //printf("lala...here_2\n");
                 fprintf(fw, "MOV R%d, [%d]\n", reg, (r -'a' + 4096));
                 r = reg;
             }
@@ -467,6 +530,7 @@ int codeGenAuxillary(node root, FILE* fw){                     //written in pre-
                     fprintf(fw, "GE R%d, R%d\n", l, r);
                     break;
                 case EQ:
+                    //printf("lala...here\n");
                     fprintf(fw, "EQ R%d, R%d\n", l, r);
                     break;
                 case NE:
@@ -573,6 +637,9 @@ int codeGenAuxillary(node root, FILE* fw){                     //written in pre-
         case WHILE:
             lbl1 = getLabel();
             lbl2 = getLabel();
+            pushLoop();
+            loop_stack[0][loop_stack_count] = lbl1;
+            loop_stack[1][loop_stack_count] = lbl2;
             fprintf(fw, "L%d:\n", lbl1);
             l = codeGenAuxillary(root->left, fw);
             fprintf(fw, "JZ R%d, L%d\n", l, lbl2);
@@ -580,7 +647,18 @@ int codeGenAuxillary(node root, FILE* fw){                     //written in pre-
             fprintf(fw, "JMP L%d\n", lbl1);
             fprintf(fw, "L%d:\n", lbl2);
 
+            popLoop();
             freeReg();
+            break;
+
+        case BREAK:
+            if(loop_stack_count >= 0)
+                fprintf(fw, "JMP L%d\n", loop_stack[1][loop_stack_count]);
+            break;
+
+        case CONT:
+            if(loop_stack_count >= 0)
+                fprintf(fw, "JMP L%d\n", loop_stack[0][loop_stack_count]);
             break;
 
 
