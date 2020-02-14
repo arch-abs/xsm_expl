@@ -1,0 +1,14 @@
+decl
+    int haloaa, youtube[4];
+    str oops;
+    str ABS[5], GD;
+enddecl
+
+begin
+
+    haloaa = 1;
+    ABS[2] = "lola";
+    youtube[0] = 5;
+    write(youtube[0]);
+    write(ABS[2]);
+end;

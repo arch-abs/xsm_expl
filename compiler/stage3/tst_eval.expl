@@ -1,0 +1,6 @@
+begin
+    i =1;
+    if(a < b < c) then
+        a = 2;
+    endif;
+end;

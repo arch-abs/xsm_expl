@@ -1,0 +1,13 @@
+begin
+    read(a);
+    b = 1;
+    while(a <= 10) do
+        if(a == 4+b) then
+            write(a+100);
+            continue;
+        else
+            write(a);
+        endif;
+        a = a+1;
+    endwhile;
+end;

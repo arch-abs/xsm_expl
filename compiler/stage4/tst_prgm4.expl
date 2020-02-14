@@ -1,0 +1,21 @@
+begin
+
+
+a = 1;
+while(a <= 10) do
+    b = 1;
+    while(a!=b) do
+        write(b);
+        if(b == a/2) then
+            break;
+        endif;
+        b = b + 1;
+    endwhile;
+
+    if(a == 5) then
+        break;
+    endif;
+    a = a + 1;
+endwhile;
+
+end;
