@@ -10,6 +10,8 @@ int loop_stack_count = -1;
 
 int TYPE;
 
+int binding = 4095;
+
 Gsymbol_entry Gsymbol_head = NULL;
 
 void pushLoop()
@@ -48,7 +50,6 @@ Gsymbol_entry lookUp(char *name)
 
 void install(char *name, int type, int size)
 {
-    int binding = 4096;
     Gsymbol_entry new = (Gsymbol_entry)malloc(sizeof(struct Gsymbol));
     Gsymbol_entry tmp = Gsymbol_head;
     new->name = name;
@@ -58,6 +59,7 @@ void install(char *name, int type, int size)
 
     if (tmp == NULL)
     {
+        binding++;
         new->binding = binding;
         Gsymbol_head = new;
     }
@@ -517,7 +519,7 @@ int codeGen(node root)
         else
             fprintf(fw, "0\n");
 
-    fprintf(fw, "MOV SP, 4121\n"); //code to initialize stack from 4096 not 4095 cause one location used for storing result of calculation
+    // fprintf(fw, "MOV SP, 4121\n"); //code to initialize stack from 4096 not 4095 cause one location used for storing result of calculation
     fprintf(fw, "BRKP\n");
 
     int ret = codeGenAuxillary(root, fw);
@@ -548,6 +550,8 @@ int codeGenAuxillary(node root, FILE *fw)
     int l, r, reg, lbl1, lbl2;
     char c;
 
+    fprintf(fw, "MOV SP, %d\n", binding); //code to initialize stack
+
     switch (root->nodetype)
     {
     case NUM:
@@ -563,8 +567,23 @@ int codeGenAuxillary(node root, FILE *fw)
         break;
 
     case ID:
+
         reg = getFreeReg();
-        fprintf(fw, "MOV R%d, %d\n", reg, (root->val) + (root->GSTptr)->binding);       //adding val as it contains index in case of array
+        fprintf(fw, "MOV R%d, %d\n", reg, (root->GSTptr)->binding);
+
+        if(root->left != NULL)      //condition when ID is of array type
+        {
+            l = codeGenAuxillary(root->left, fw);
+            if (root->left->nodetype == ID)
+            {
+                //reg = getFreeReg();
+                fprintf(fw, "MOV R%d, [R%d]\n", l, l);
+                //l = reg;
+            }
+            fprintf(fw, "ADD R%d, R%d\n", reg, l);
+            freeReg();
+        }
+
         return reg;
         break;
 

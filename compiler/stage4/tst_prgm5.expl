@@ -1,14 +1,35 @@
 decl
-    int haloaa, youtube[4];
+    int i, haloaa,arr[5], youtube[4];
     str oops;
     str ABS[5], GD;
 enddecl
 
 begin
 
+    i=0;
+    while( i < 5) do
+        read(arr[i]);
+        i = i+1;
+    endwhile;
+
+    write("done read..");
+
+    i=0;
+    while( i < 5) do
+        write(arr[i]);
+        i = i  + 1;
+    endwhile;
+
+    read(haloaa);
     haloaa = 1;
     ABS[2] = "lola";
     youtube[0] = 5;
+    read(youtube[haloaa]);
     write(youtube[0]);
+    write(youtube[1]);
+    write(youtube[haloaa]);
+    read(youtube[youtube[haloaa]]);
+    write(youtube[youtube[haloaa]]);
     write(ABS[2]);
+    youtube[haloaa] = 4; 
 end;

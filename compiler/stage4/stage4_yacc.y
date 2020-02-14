@@ -115,6 +115,22 @@
                                                     $$ = createTree(-1, READ, NULL, READ, $3, NULL, NULL);
                                                     
                                                 }
+
+
+                    |READ '(' ID '[' E ']' ')' ';'         {
+                                                    $3->GSTptr = lookUp($3->varname);   //finding and setting GSTptr
+
+                                                    $3->type = ($3->GSTptr)->type;      //setting type from GSTptr
+                                                    $3->left = $5;
+                                                    if ($3->left->type != INTEGER)     //TYPE_CHK
+                                                    {
+                                                        printf("TYPE_ERR..!!! array_index INTEGER expected something else....!!!\n");
+                                                        exit(0);
+                                                    }
+
+                                                    $$ = createTree(-1, READ, NULL, READ, $3, NULL, NULL);
+                                                    
+                                                }
                     ;
 
     OutputStmt:     WRITE '(' E ')' ';'         {$$ = createTree(-1, WRITE, NULL, WRITE, $3, NULL, NULL);}
@@ -127,11 +143,18 @@
                                                     
                                                     $$ = createTree('=', '=', NULL, ASSGNOP, $1, $3, NULL);
                                                 }
-                    | ID'['NUM']' '=' E ';'     {
+                    | ID'[' E ']' '=' E ';'     {
                                                     $1->GSTptr = lookUp($1->varname);   //finding and setting GSTptr
 
                                                     $1->type = ($1->GSTptr)->type;      //setting type from GSTptr
-                                                    $1->val = $3->val;
+                                                    // $1->val = $3->val;
+
+                                                    $1->left = $3;
+                                                    if ($1->left->type != INTEGER)     //TYPE_CHK
+                                                    {
+                                                        printf("TYPE_ERR..!!! array_index INTEGER expected something else....!!!\n");
+                                                        exit(0);
+                                                    }
 
                                                     $$ = createTree('=', '=', NULL, ASSGNOP, $1, $6, NULL);
                                                 }
@@ -171,8 +194,8 @@
                                         printf("LALA..!!!! type is %d\n", $$->type);
                                         printf("val of GSTptr is %p\n", $$->GSTptr);
                                       }
-                    | ID'['NUM']'     {
-                                        printf("LALA..!!!! in ID reduc....\n");
+                    | ID'['E']'     {
+                                        printf("LALALOLO..!!!! in ID[E] reduc....\n");
                                         $1->GSTptr = lookUp($1->varname);   //finding and setting GSTptr
                                         // if($1->GSTptr == NULL)
                                         // {
@@ -180,7 +203,13 @@
                                         //     exit(1);
                                         // }
                                         $1->type = ($1->GSTptr)->type;      //setting type from GSTptr
-                                        $1->val = $3->val;
+                                        // $1->val = $3->val;
+                                        $1->left = $3;
+                                        if ($1->left->type != INTEGER)     //TYPE_CHK
+                                        {
+                                            printf("TYPE_ERR..!!! array_index INTEGER expected something else....!!!\n");
+                                            exit(0);
+                                        }
                                         $$ = $1;
                                         printf("LALA..!!!! varname is %s\n", $$->GSTptr->name);
                                         printf("LALA..!!!! type is %d\n", $$->type);
