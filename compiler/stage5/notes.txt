@@ -1,0 +1,55 @@
+SYMBOLS_ADDED
+
+GdeclBlock
+GdeclList   
+GDecl
+GidList
+Gid
+
+'(' token
+')' token
+'{' token
+'}' token
+FDefBlock
+FDef
+ParamList
+LDeclBlock
+Body
+Param
+
+LDeclBlock
+LDecList
+LDecl
+IdList
+
+ArgList
+
+RETURN  <token>
+
+MainBlock
+
+MAIN  <token>
+
+
+
+SYMBOLS_REMOVED
+
+Declarations
+DeclList
+Decl
+VarList
+
+
+
+
+
+
+
+
+revoke comments in ARTHOP, RELOP and if
+
+
+!!!!!......  REMEBER expl allows RETURN statement ONLY at LAST  ...!!!!!!
+
+**Remember to remove INT10 syscall call form codeGen and put inside codeGen for MAIN() func (on return 0 stmt)
+

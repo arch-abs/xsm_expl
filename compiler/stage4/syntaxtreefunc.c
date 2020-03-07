@@ -187,9 +187,9 @@ node createTree(int val, int type, char *varname, int nodetype, node left, node 
         tmp->right = right;
         tmp->str_val = NULL;
         tmp->GSTptr = NULL;
-        if (tmp->left->type != INTEGER || tmp->right->type != INTEGER)
+        if ((tmp->left->type != INTEGER || tmp->right->type != INTEGER)  && (tmp->left->type != STRING || tmp->right->type != STRING))
         { //TYPE_CHK
-            printf("TYPE_ERR..!!! RELOP expects type INTEGER on LHS and type INTEGER on RHS...\n");
+            printf("TYPE_ERR..!!! RELOP expects type INTEGER  or STRING on both LHS and RHS... found something else \n");
             exit(0);
         }
         break;
@@ -231,6 +231,11 @@ node createTree(int val, int type, char *varname, int nodetype, node left, node 
         tmp->right = NULL;
         tmp->str_val = NULL;
         tmp->GSTptr = NULL;
+        if (tmp->left->type != INTEGER  &&  tmp->left->type != STRING)
+        { //TYPE_CHK
+            printf("TYPE_ERR..!!! write expects INTEGER or STRING... found something else....!!!\n");
+            exit(0);
+        }
         break;
 
     case WHILE:
@@ -520,6 +525,7 @@ int codeGen(node root)
             fprintf(fw, "0\n");
 
     // fprintf(fw, "MOV SP, 4121\n"); //code to initialize stack from 4096 not 4095 cause one location used for storing result of calculation
+    fprintf(fw, "MOV SP, %d\n", binding); //code to initialize stack
     fprintf(fw, "BRKP\n");
 
     int ret = codeGenAuxillary(root, fw);
@@ -550,7 +556,7 @@ int codeGenAuxillary(node root, FILE *fw)
     int l, r, reg, lbl1, lbl2;
     char c;
 
-    fprintf(fw, "MOV SP, %d\n", binding); //code to initialize stack
+    
 
     switch (root->nodetype)
     {

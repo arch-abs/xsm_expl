@@ -28,7 +28,7 @@
             return NUM;
         }
 
-([\"](.)*[\"])    {
+([\"][a-zA-Z0-9]*[\"])    {
             yylval.root = createTree(number, STRING, yytext, STRING_LITERAL, NULL, NULL, NULL);
             return STRING_LITERAL;
         }

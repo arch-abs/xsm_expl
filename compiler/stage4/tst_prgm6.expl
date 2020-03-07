@@ -1,21 +1,33 @@
 decl
     int n,i,j,sum,k;
+	int arr[100];
+	str a, b;
 enddecl
 
 begin
 	read(n);
 	sum=0;
 	k=1;
+	a = "ABS";
+	b = "ARCH";
+	write(2+7);
+	write( "abs" < "arch" );
 	while(k<=n)do
 		if(n<=1) then
 			sum=sum+1;
+			break;
 		else
 			i=1;
 			j=1;
-			while(i<=k)do
+			while(i<=5)do
 				j=j*i;
 				i=i+1;
+				if(i == 3) then
+					break;
+				endif;
 			endwhile;
+			write(i);
+			arr[arr[i]] = 1;
 			sum=sum+j;
 		endif;
 		k=k+1;
