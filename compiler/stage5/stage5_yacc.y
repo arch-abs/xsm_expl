@@ -72,15 +72,17 @@
 
     
 
-    GdeclBlock  :   DECL GdeclList ENDDECL
-                    | DECL ENDDECL
-                ;
+    GdeclBlock  :   DECL GdeclList ENDDECL         {printGsymbolTable();}
+                    | DECL ENDDECL                 {printGsymbolTable();}
+                    ;
 
     GdeclList    :   GdeclList GDecl               {}
                     |GDecl                         {}
                     ;
 
-    GDecl        :   Type GidList ';'              {}
+    GDecl        :   Type GidList ';'              {
+                                                        popType();
+                                                   }
                     ;
 
     // Type        :   INTEGER                     {TYPE = INTEGER;}   //REMOVE FROM here and bear FDefBlock Later
@@ -89,16 +91,20 @@
 
     GidList     :   GidList ',' Gid              {}
                     | Gid                        {}
+                    ;
 
-    Gid         :   ID                          {}
-                    | ID'['NUM']'               {}
-                    | ID '(' ParamList ')'      {}
+    Gid         :   ID                          {installGId($1->varname, getType(), 1);}
+                    | ID'['NUM']'               {installGId($1->varname, getType(), $3->val);}
+                    | ID '(' ParamList ')'      {
+                                                    installFunc($1->varname, getType(), paramHeadPtr);
+                                                    paramHeadPtr = NULL;
+                                                }
                     ;
 
 
 
 
-    MainBlock   :   INTEGER MAIN '(' ')' '{' LDeclBlock Body '}'        {}
+    MainBlock   :   INTEGER MAIN '(' ')' '{' LDeclBlock Body '}'           {}
                     // | INTEGER MAIN '(' ')' '{' Body '}'                 {}   //LDeclBlock mandatory
                     ;
 
@@ -110,8 +116,12 @@
                     | FDef                      {}
                     ;
 
-    FDef        :   Type ID '(' ParamList ')' '{' LDeclBlock Body '}'   {}      //Note that body is necessary as we need to have a return statement atleast as void returntype is not allowed
-                    |Type ID '('  ')' '{' LDeclBlock Body '}'           {}
+    FDef        :   Type ID '(' ParamList ')' '{' LDeclBlock Body '}'   {
+                                                                            paramHeadPtr = NULL;
+                                                                        }      //Note that body is necessary as we need to have a return statement atleast as void returntype is not allowed
+                    |Type ID '('  ')' '{' LDeclBlock Body '}'           {
+                                                                            paramHeadPtr = NULL;
+                                                                        }
                     // |Type ID '(' ParamList ')' '{' Body '}'             {}   //LDeclBlock mandatory in Fdef
                     // |Type ID '('  ')' '{' Body '}'                      {}
                     ;
@@ -119,11 +129,21 @@
     ParamList   :   ParamList ',' Param         {}
                     | Param                     {}
                     ;
-    Param       :   Type ID                     {}
+
+    Param       :   Type ID                     {
+                                                    paramHeadPtr = addToParamList(getType(), $2->varname);
+                                                    popType();
+                                                }
                     ;
 
-    Type        :   INTEGER                     {TYPE = INTEGER;}
-                    |STRING                     {TYPE = STRING;}
+    Type        :   INTEGER                     {
+                                                    // TYPE = INTEGER;
+                                                    pushType(INTEGER);
+                                                }
+                    |STRING                     {
+                                                    // TYPE = STRING;
+                                                    pushType(STRING);
+                                                }
                     ;
 
 
@@ -140,7 +160,9 @@
                     |   LDecl                    {}
                     ;
 
-    LDecl       :   Type IdList ';'            {}
+    LDecl       :   Type IdList ';'            {
+                                                    popType();
+                                               }
                     ;
 
     IdList      :   IdList ',' ID              {}

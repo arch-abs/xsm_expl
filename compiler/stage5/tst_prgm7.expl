@@ -1,5 +1,8 @@
 decl
-    int result, factorial(int n);
+    int factorial(str lol, int n, str s), result[10], func( int x, int y, str lola);
+    str oops;
+    str funcy(str toootoo, int picoo);
+    int haha;
 enddecl
 
 int factorial(int n) {

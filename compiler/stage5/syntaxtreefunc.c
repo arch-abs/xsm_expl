@@ -1,22 +1,104 @@
 #include <string.h>
 // MIGHT NEED TO INCLUDE exprtreedecl.h here
-// #include "syntaxtreedecl.h"
+//  #include "syntaxtreedecl.h"
 #include "y.tab.h"
 
 int regCount = 0; //might need to change this to array based in future
 int lblCount = -1;
+int funcLblCount = -1;
 
 int loop_stack_count = -1;
+int type_stack_count = -1;
 
-int TYPE;
+// int TYPE;
+
+paramList paramHeadPtr = NULL;      //used in making paramList
 
 int binding = 4095;
 
+int loop_stack[2][10000]; //0 is for entry point lbl & 1 is for exit pt label
+
+int type_stack[10000];
+
 Gsymbol_entry Gsymbol_head = NULL;
 
-void pushLoop()
+
+
+
+
+int getFreeReg()
 {
-    loop_stack_count++;
+    if (regCount >= 20)
+    {
+        printf("Error!!!! NO REGS FREE\n");
+        exit(0);
+        return -1;
+    }
+    regCount++;
+    return (regCount - 1);
+}
+
+void freeReg()
+{
+    // printf("In freeReg()...\n");
+    if (regCount > 0){
+        // printf("Decrementing reg count...\n");
+        regCount--;
+    }
+    else
+    {
+        printf("Error!!!! NO REGS to REALEASE\n");
+        exit(0);
+    }
+}
+
+
+int getLabel()
+{
+    lblCount++;
+    return lblCount;
+}
+
+int getFuncLabel()
+{
+    funcLblCount++;
+    return funcLblCount;
+}
+
+
+void pushType(int type){
+    if(type_stack_count >= 10000){
+        printf(">>>ERROR<<<!!!...TYPE_STACK OVERFLOW.... exiting...\n");
+        exit(0);
+    }
+    else{
+        type_stack_count++;
+        type_stack[type_stack_count] = type;    
+    }
+}
+
+void popType()
+{
+    if (type_stack_count <= -1)
+        printf("ERR...!!! TYPE STACK count trying to over pop...\n");
+    else
+        type_stack_count--;
+}
+
+int getType(){
+    return type_stack[type_stack_count];
+}
+
+
+
+
+void pushLoop()
+{   if(loop_stack_count >= 10000){
+        printf(">>>ERROR<<<!!!...LOPP_STACK OVERFLOW.... exiting...\n");
+        exit(0);
+    }
+    else
+        loop_stack_count++;
 }
 
 void popLoop()
@@ -27,13 +109,46 @@ void popLoop()
         loop_stack_count--;
 }
 
-int loop_stack[2][1000]; //0 is for entry point lbl & 1 is for exit pt label
+
+
+paramList addToParamList(int type, char* name){
+    // printf("LOLA>..!!! IN addtoParamList()\n");
+    paramList new = (paramList)malloc(sizeof(struct paramListNode));
+    new->type = type;
+    new->name = strdup(name);
+    new->next = NULL;
+
+    if(paramHeadPtr == NULL)
+        paramHeadPtr = new;
+    else{
+        paramList tmp = paramHeadPtr;
+        if (strcmp(tmp->name, name) == 0)
+        {
+            printf("ERR..!!! Parameter name redeclared... (printing from addToParamList())...EXITing\n");
+            exit(0);
+        }
+        while(tmp->next != NULL){
+            if (strcmp(tmp->name, name) == 0)
+            {
+                printf("ERR..!!! Parameter name redeclared... (printing from addToParamList())...EXITing\n");
+                exit(0);
+            }
+            tmp = tmp->next;
+        }
+        tmp->next = new;
+    }
+
+    return paramHeadPtr;
+
+}
+
+
 
 Gsymbol_entry lookUp(char *name)
 {
     if (Gsymbol_head == NULL)
     {
-        printf("ERR...!!! Trying to LookUp in EMPTY GSymbol Table...!!!\n");
+        printf("ERR...!!! Trying to LookUp in EMPTY GSymbol Table...!!!...EXITing\n");
         return NULL;
     }
     Gsymbol_entry tmp = Gsymbol_head;
@@ -48,13 +163,14 @@ Gsymbol_entry lookUp(char *name)
     return NULL;
 }
 
-void install(char *name, int type, int size)
+void installGId(char *name, int type, int size)
 {
     Gsymbol_entry new = (Gsymbol_entry)malloc(sizeof(struct Gsymbol));
     Gsymbol_entry tmp = Gsymbol_head;
     new->name = name;
     new->type = type;
     new->size = size;
+    new->param = NULL;
     new->next = NULL;
 
     if (tmp == NULL)
@@ -65,6 +181,29 @@ void install(char *name, int type, int size)
     }
     else
     {
+        // if (strcmp(tmp->name, name) == 0)
+        // {
+        //     printf("ERR..!!! Variable redeclared... (printing from installGId())\n");
+        //     exit(0);
+        // }
+
+        // while (tmp->next != NULL)
+        // {
+        //     if (strcmp(tmp->name, name) == 0)
+        //     {
+        //         printf("ERR..!!! Variable redeclared... (printing from installGId())\n");
+        //         exit(0);
+        //     }
+        //     tmp = tmp->next;
+        //     if(tmp->size != -1)     //if node is not of func type
+        //         binding = binding + tmp->size;
+        // }
+        // binding++;
+        // new->binding = binding;
+        // tmp->next = new;
+
+        long size_sum;
+        size_sum = 0;
         while (tmp->next != NULL)
         {
             if (strcmp(tmp->name, name) == 0)
@@ -72,9 +211,21 @@ void install(char *name, int type, int size)
                 printf("ERR..!!! Variable redeclared... (printing from install())\n");
                 exit(0);
             }
+            if(tmp->size != -1)
+                size_sum = size_sum + tmp->size;
             tmp = tmp->next;
-            binding = binding + tmp->size;
         }
+
+        if (strcmp(tmp->name, name) == 0)
+        {
+            printf("ERR..!!! Variable redeclared... (printing from installGId())\n");
+            exit(0);
+        }
+        if(tmp->size != -1)
+            size_sum = size_sum + tmp->size;
+
+
+        binding = 4095 + size_sum;
         binding++;
         new->binding = binding;
         tmp->next = new;
@@ -82,6 +233,58 @@ void install(char *name, int type, int size)
 }
 
 
+void installFunc(char *name, int type, paramList param)
+{
+    Gsymbol_entry new = (Gsymbol_entry)malloc(sizeof(struct Gsymbol));
+    Gsymbol_entry tmp = Gsymbol_head;
+    new->name = name;
+    new->type = type;
+    new->size = -1;
+    new->binding = getFuncLabel();
+    new->param = param;
+    new->next = NULL;
+
+    if (tmp == NULL)
+    {
+        // binding++;
+        // new->binding = binding;
+        Gsymbol_head = new;
+    }
+    else
+    {
+        while (tmp->next != NULL)
+        {
+            if (strcmp(tmp->name, name) == 0)
+            {
+                printf("ERR..!!! Variable redeclared... (printing from installGId())\n");
+                exit(0);
+            }
+            tmp = tmp->next;
+            // binding = binding + tmp->size;
+        }
+        // binding++;
+        // new->binding = binding;
+        tmp->next = new;
+    }
+}
+
+
+void printParamList(paramList head){
+    paramList tmp = head;
+
+    if(tmp == NULL)
+        printf(">>PARAM_LST EMPTY<<\n");
+    else{
+        int count;
+        printf(">>Printing PARAM_LST<<\n");
+        count = 0;
+        while(tmp!=NULL){
+            count++;
+            printf("\tPARAM_NUM: %d -> paramName: %s    paramType: %d\n", count, tmp->name, tmp->type);
+            tmp = tmp->next;
+        }
+    }
+}
 
 void printGsymbolTable()        //for DEBUGGING PURPOSES
 {
@@ -93,7 +296,13 @@ void printGsymbolTable()        //for DEBUGGING PURPOSES
         printf("----------------GST_Entry_%d---------------\n", count);
         printf("varname: %s\n", tmp->name);
         printf("type: %d\n", tmp->type);
-        printf("size: %d\n", tmp->size);
+        if(tmp->size == -1)
+        {
+            printf("FUNCTION\n");
+            printParamList(tmp->param);
+        }
+        else
+            printf("VARIABLE\nsize: %d\n", tmp->size);
         printf("binding: %d\n", tmp->binding);
         printf("\n\n");
 
@@ -380,37 +589,9 @@ void callPostfixPrint(node root){
 }
 */
 
-int getFreeReg()
-{
-    if (regCount >= 20)
-    {
-        printf("Error!!!! NO REGS FREE\n");
-        exit(0);
-        return -1;
-    }
-    regCount++;
-    return (regCount - 1);
-}
 
-void freeReg()
-{
-    // printf("In freeReg()...\n");
-    if (regCount > 0){
-        // printf("Decrementing reg count...\n");
-        regCount--;
-    }
-    else
-    {
-        printf("Error!!!! NO REGS to REALEASE\n");
-        exit(0);
-    }
-}
 
-int getLabel()
-{
-    lblCount++;
-    return lblCount;
-}
+
 
 /*
 int codeGen(node root){

@@ -29,14 +29,29 @@ int line;
 
 
 
-struct Gsymbol{
-    char* name;     // name of the variable
-    int type;       // type of the variable
-    int size;       // size of the type of the variable
-    int binding;    // stores the static memory address allocated to the variable
-    struct Gsymbol* next;      //pointer to next entry in the symbol table
+struct paramListNode
+{
+    int type;
+    char* name;
+    struct paramListNode* next;
 };
+typedef struct paramListNode* paramList;
 
+
+struct Gsymbol{
+
+    // * Identify Array as size >= 1  AND  param == NULL
+    // * Identify simple VAR as size == 1  AND  param == NULL
+    // * Identify FUNC as size = -1
+
+
+    char* name;                 // name of the variable
+    int type;                   // type of the variable
+    int size;                   // <<USED ONLY FOR VARs>> size of the type of the variable
+    int binding;                // stores the STATIC memory address allocated to the VAR  or LABEL binding num for FUNC...in form of <F NUM  
+    paramList param;            // <<USED_ONLY_FOR_FUNC>> parameter list associated with function
+    struct Gsymbol* next;       // pointer to next entry in the symbol table
+};
 typedef struct Gsymbol* Gsymbol_entry;
 
 
@@ -53,7 +68,6 @@ struct tnode{
     Gsymbol_entry GSTptr;
     
 };
-
 typedef struct tnode* node;
 
 

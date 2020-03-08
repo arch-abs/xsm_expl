@@ -1,5 +1,5 @@
 decl
-    int n,i,j,sum,k;
+    int c, n, i, j , sum, k;
 	int arr[100];
 	str a, b;
 enddecl
@@ -11,7 +11,7 @@ begin
 	a = "ABS";
 	b = "ARCH";
 	write(2+7);
-	write( "abs" < "arch" );
+	
 	while(k<=n)do
 		if(n<=1) then
 			sum=sum+1;

@@ -65,6 +65,8 @@ void install(char *name, int type, int size)
     }
     else
     {
+        long size_sum;
+        size_sum = 0;
         while (tmp->next != NULL)
         {
             if (strcmp(tmp->name, name) == 0)
@@ -72,9 +74,19 @@ void install(char *name, int type, int size)
                 printf("ERR..!!! Variable redeclared... (printing from install())\n");
                 exit(0);
             }
+            size_sum = size_sum + tmp->size;
             tmp = tmp->next;
-            binding = binding + tmp->size;
         }
+
+        if (strcmp(tmp->name, name) == 0)
+        {
+            printf("ERR..!!! Variable redeclared... (printing from installGId())\n");
+            exit(0);
+        }
+        size_sum = size_sum + tmp->size;
+
+
+        binding = 4095 + size_sum;
         binding++;
         new->binding = binding;
         tmp->next = new;

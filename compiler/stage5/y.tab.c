@@ -496,13 +496,13 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint16 yyrline[] =
 {
        0,    42,    42,    43,    44,    75,    76,    79,    80,    83,
-      90,    91,    93,    94,    95,   101,   109,   110,   113,   114,
-     119,   120,   122,   125,   126,   135,   136,   139,   140,   143,
-     146,   147,   187,   188,   191,   192,   195,   196,   197,   198,
-     199,   200,   201,   204,   214,   230,   233,   240,   257,   258,
-     261,   264,   266,   269,   270,   271,   272,   273,   274,   275,
-     276,   277,   291,   314,   315,   316,   317,   318,   319,   321,
-     322,   326,   327
+      92,    93,    96,    97,    98,   107,   115,   116,   119,   122,
+     129,   130,   133,   139,   143,   155,   156,   159,   160,   163,
+     168,   169,   209,   210,   213,   214,   217,   218,   219,   220,
+     221,   222,   223,   226,   236,   252,   255,   262,   279,   280,
+     283,   286,   288,   291,   292,   293,   294,   295,   296,   297,
+     298,   299,   313,   336,   337,   338,   339,   340,   341,   343,
+     344,   348,   349
 };
 #endif
 
@@ -1444,224 +1444,256 @@ yyreduce:
 #line 1445 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 5:
+#line 75 "stage5_yacc.y" /* yacc.c:1646  */
+    {printGsymbolTable();}
+#line 1451 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 6:
+#line 76 "stage5_yacc.y" /* yacc.c:1646  */
+    {printGsymbolTable();}
+#line 1457 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 7:
 #line 79 "stage5_yacc.y" /* yacc.c:1646  */
     {}
-#line 1451 "y.tab.c" /* yacc.c:1646  */
+#line 1463 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
 #line 80 "stage5_yacc.y" /* yacc.c:1646  */
     {}
-#line 1457 "y.tab.c" /* yacc.c:1646  */
+#line 1469 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
 #line 83 "stage5_yacc.y" /* yacc.c:1646  */
-    {}
-#line 1463 "y.tab.c" /* yacc.c:1646  */
+    {
+                                                        popType();
+                                                   }
+#line 1477 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 90 "stage5_yacc.y" /* yacc.c:1646  */
+#line 92 "stage5_yacc.y" /* yacc.c:1646  */
     {}
-#line 1469 "y.tab.c" /* yacc.c:1646  */
+#line 1483 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 91 "stage5_yacc.y" /* yacc.c:1646  */
+#line 93 "stage5_yacc.y" /* yacc.c:1646  */
     {}
-#line 1475 "y.tab.c" /* yacc.c:1646  */
+#line 1489 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 93 "stage5_yacc.y" /* yacc.c:1646  */
-    {}
-#line 1481 "y.tab.c" /* yacc.c:1646  */
+#line 96 "stage5_yacc.y" /* yacc.c:1646  */
+    {installGId((yyvsp[0].root)->varname, getType(), 1);}
+#line 1495 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 94 "stage5_yacc.y" /* yacc.c:1646  */
-    {}
-#line 1487 "y.tab.c" /* yacc.c:1646  */
+#line 97 "stage5_yacc.y" /* yacc.c:1646  */
+    {installGId((yyvsp[-3].root)->varname, getType(), (yyvsp[-1].root)->val);}
+#line 1501 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 95 "stage5_yacc.y" /* yacc.c:1646  */
-    {}
-#line 1493 "y.tab.c" /* yacc.c:1646  */
+#line 98 "stage5_yacc.y" /* yacc.c:1646  */
+    {
+                                                    installFunc((yyvsp[-3].root)->varname, getType(), paramHeadPtr);
+                                                    paramHeadPtr = NULL;
+                                                }
+#line 1510 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 101 "stage5_yacc.y" /* yacc.c:1646  */
+#line 107 "stage5_yacc.y" /* yacc.c:1646  */
     {}
-#line 1499 "y.tab.c" /* yacc.c:1646  */
+#line 1516 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 109 "stage5_yacc.y" /* yacc.c:1646  */
+#line 115 "stage5_yacc.y" /* yacc.c:1646  */
     {}
-#line 1505 "y.tab.c" /* yacc.c:1646  */
+#line 1522 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 110 "stage5_yacc.y" /* yacc.c:1646  */
+#line 116 "stage5_yacc.y" /* yacc.c:1646  */
     {}
-#line 1511 "y.tab.c" /* yacc.c:1646  */
+#line 1528 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 113 "stage5_yacc.y" /* yacc.c:1646  */
-    {}
-#line 1517 "y.tab.c" /* yacc.c:1646  */
+#line 119 "stage5_yacc.y" /* yacc.c:1646  */
+    {
+                                                                            paramHeadPtr = NULL;
+                                                                        }
+#line 1536 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 114 "stage5_yacc.y" /* yacc.c:1646  */
-    {}
-#line 1523 "y.tab.c" /* yacc.c:1646  */
+#line 122 "stage5_yacc.y" /* yacc.c:1646  */
+    {
+                                                                            paramHeadPtr = NULL;
+                                                                        }
+#line 1544 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 119 "stage5_yacc.y" /* yacc.c:1646  */
+#line 129 "stage5_yacc.y" /* yacc.c:1646  */
     {}
-#line 1529 "y.tab.c" /* yacc.c:1646  */
+#line 1550 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 120 "stage5_yacc.y" /* yacc.c:1646  */
+#line 130 "stage5_yacc.y" /* yacc.c:1646  */
     {}
-#line 1535 "y.tab.c" /* yacc.c:1646  */
+#line 1556 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 122 "stage5_yacc.y" /* yacc.c:1646  */
-    {}
-#line 1541 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 23:
-#line 125 "stage5_yacc.y" /* yacc.c:1646  */
-    {TYPE = INTEGER;}
-#line 1547 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 24:
-#line 126 "stage5_yacc.y" /* yacc.c:1646  */
-    {TYPE = STRING;}
-#line 1553 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 25:
-#line 135 "stage5_yacc.y" /* yacc.c:1646  */
-    {}
-#line 1559 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 26:
-#line 136 "stage5_yacc.y" /* yacc.c:1646  */
-    {}
+#line 133 "stage5_yacc.y" /* yacc.c:1646  */
+    {
+                                                    paramHeadPtr = addToParamList(getType(), (yyvsp[0].root)->varname);
+                                                    popType();
+                                                }
 #line 1565 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 27:
+  case 23:
 #line 139 "stage5_yacc.y" /* yacc.c:1646  */
-    {}
-#line 1571 "y.tab.c" /* yacc.c:1646  */
+    {
+                                                    // TYPE = INTEGER;
+                                                    pushType(INTEGER);
+                                                }
+#line 1574 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 28:
-#line 140 "stage5_yacc.y" /* yacc.c:1646  */
-    {}
-#line 1577 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 29:
+  case 24:
 #line 143 "stage5_yacc.y" /* yacc.c:1646  */
-    {}
+    {
+                                                    // TYPE = STRING;
+                                                    pushType(STRING);
+                                                }
 #line 1583 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 30:
-#line 146 "stage5_yacc.y" /* yacc.c:1646  */
+  case 25:
+#line 155 "stage5_yacc.y" /* yacc.c:1646  */
     {}
 #line 1589 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 31:
-#line 147 "stage5_yacc.y" /* yacc.c:1646  */
+  case 26:
+#line 156 "stage5_yacc.y" /* yacc.c:1646  */
     {}
 #line 1595 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 32:
-#line 187 "stage5_yacc.y" /* yacc.c:1646  */
+  case 27:
+#line 159 "stage5_yacc.y" /* yacc.c:1646  */
     {}
 #line 1601 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 33:
-#line 188 "stage5_yacc.y" /* yacc.c:1646  */
+  case 28:
+#line 160 "stage5_yacc.y" /* yacc.c:1646  */
     {}
 #line 1607 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 29:
+#line 163 "stage5_yacc.y" /* yacc.c:1646  */
+    {
+                                                    popType();
+                                               }
+#line 1615 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 30:
+#line 168 "stage5_yacc.y" /* yacc.c:1646  */
+    {}
+#line 1621 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 31:
+#line 169 "stage5_yacc.y" /* yacc.c:1646  */
+    {}
+#line 1627 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 32:
+#line 209 "stage5_yacc.y" /* yacc.c:1646  */
+    {}
+#line 1633 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 33:
+#line 210 "stage5_yacc.y" /* yacc.c:1646  */
+    {}
+#line 1639 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 34:
-#line 191 "stage5_yacc.y" /* yacc.c:1646  */
+#line 213 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree(-1, CONNECTOR, NULL, CONNECTOR, (yyvsp[-1].root), (yyvsp[0].root), NULL);}
-#line 1613 "y.tab.c" /* yacc.c:1646  */
+#line 1645 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 192 "stage5_yacc.y" /* yacc.c:1646  */
+#line 214 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = (yyvsp[0].root);}
-#line 1619 "y.tab.c" /* yacc.c:1646  */
+#line 1651 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 195 "stage5_yacc.y" /* yacc.c:1646  */
+#line 217 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root)=(yyvsp[0].root);}
-#line 1625 "y.tab.c" /* yacc.c:1646  */
+#line 1657 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 196 "stage5_yacc.y" /* yacc.c:1646  */
+#line 218 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root)=(yyvsp[0].root);}
-#line 1631 "y.tab.c" /* yacc.c:1646  */
+#line 1663 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 197 "stage5_yacc.y" /* yacc.c:1646  */
+#line 219 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root)=(yyvsp[0].root);}
-#line 1637 "y.tab.c" /* yacc.c:1646  */
+#line 1669 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 198 "stage5_yacc.y" /* yacc.c:1646  */
+#line 220 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root)=(yyvsp[0].root);}
-#line 1643 "y.tab.c" /* yacc.c:1646  */
+#line 1675 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 199 "stage5_yacc.y" /* yacc.c:1646  */
+#line 221 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root)=(yyvsp[0].root);}
-#line 1649 "y.tab.c" /* yacc.c:1646  */
+#line 1681 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 200 "stage5_yacc.y" /* yacc.c:1646  */
+#line 222 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root)=(yyvsp[0].root);}
-#line 1655 "y.tab.c" /* yacc.c:1646  */
+#line 1687 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 201 "stage5_yacc.y" /* yacc.c:1646  */
+#line 223 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root)=(yyvsp[0].root);}
-#line 1661 "y.tab.c" /* yacc.c:1646  */
+#line 1693 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 204 "stage5_yacc.y" /* yacc.c:1646  */
+#line 226 "stage5_yacc.y" /* yacc.c:1646  */
     {
                                                     // $3->GSTptr = lookUp($3->varname);   //finding and setting GSTptr
 
@@ -1670,11 +1702,11 @@ yyreduce:
                                                     // $$ = createTree(-1, READ, NULL, READ, $3, NULL, NULL);
                                                     
                                                 }
-#line 1674 "y.tab.c" /* yacc.c:1646  */
+#line 1706 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 214 "stage5_yacc.y" /* yacc.c:1646  */
+#line 236 "stage5_yacc.y" /* yacc.c:1646  */
     {
                                                     // $3->GSTptr = lookUp($3->varname);   //finding and setting GSTptr
 
@@ -1689,17 +1721,17 @@ yyreduce:
                                                     // $$ = createTree(-1, READ, NULL, READ, $3, NULL, NULL);
                                                     
                                                 }
-#line 1693 "y.tab.c" /* yacc.c:1646  */
+#line 1725 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 230 "stage5_yacc.y" /* yacc.c:1646  */
+#line 252 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree(-1, WRITE, NULL, WRITE, (yyvsp[-2].root), NULL, NULL);}
-#line 1699 "y.tab.c" /* yacc.c:1646  */
+#line 1731 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 233 "stage5_yacc.y" /* yacc.c:1646  */
+#line 255 "stage5_yacc.y" /* yacc.c:1646  */
     {
                                                     // $1->GSTptr = lookUp($1->varname);   //finding and setting GSTptr
 
@@ -1707,11 +1739,11 @@ yyreduce:
                                                     
                                                     // $$ = createTree('=', '=', NULL, ASSGNOP, $1, $3, NULL);
                                                 }
-#line 1711 "y.tab.c" /* yacc.c:1646  */
+#line 1743 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 240 "stage5_yacc.y" /* yacc.c:1646  */
+#line 262 "stage5_yacc.y" /* yacc.c:1646  */
     {
                                                     // $1->GSTptr = lookUp($1->varname);   //finding and setting GSTptr
 
@@ -1727,89 +1759,89 @@ yyreduce:
 
                                                     // $$ = createTree('=', '=', NULL, ASSGNOP, $1, $6, NULL);
                                                 }
-#line 1731 "y.tab.c" /* yacc.c:1646  */
+#line 1763 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 257 "stage5_yacc.y" /* yacc.c:1646  */
+#line 279 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree(-1, IF, NULL, IF, (yyvsp[-7].root), createTree(-1, IFBODY, NULL, IFBODY, (yyvsp[-4].root), (yyvsp[-2].root), NULL), NULL);}
-#line 1737 "y.tab.c" /* yacc.c:1646  */
+#line 1769 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 258 "stage5_yacc.y" /* yacc.c:1646  */
+#line 280 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree(-1, IF, NULL, IF, (yyvsp[-5].root), createTree(-1, IFBODY, NULL, IFBODY, (yyvsp[-2].root), NULL, NULL), NULL);}
-#line 1743 "y.tab.c" /* yacc.c:1646  */
+#line 1775 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 261 "stage5_yacc.y" /* yacc.c:1646  */
+#line 283 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree(-1, WHILE, NULL, WHILE, (yyvsp[-5].root), (yyvsp[-2].root), NULL);}
-#line 1749 "y.tab.c" /* yacc.c:1646  */
+#line 1781 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 264 "stage5_yacc.y" /* yacc.c:1646  */
+#line 286 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree(-1, BREAK, NULL, BREAK, NULL, NULL, NULL);}
-#line 1755 "y.tab.c" /* yacc.c:1646  */
+#line 1787 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 266 "stage5_yacc.y" /* yacc.c:1646  */
+#line 288 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree(-1, CONT, NULL, CONT, NULL, NULL, NULL);}
-#line 1761 "y.tab.c" /* yacc.c:1646  */
+#line 1793 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 269 "stage5_yacc.y" /* yacc.c:1646  */
+#line 291 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree('+', INTEGER, NULL, ARITHOP, (yyvsp[-2].root), (yyvsp[0].root), NULL);}
-#line 1767 "y.tab.c" /* yacc.c:1646  */
+#line 1799 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 270 "stage5_yacc.y" /* yacc.c:1646  */
+#line 292 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree('-', INTEGER, NULL, ARITHOP, (yyvsp[-2].root), (yyvsp[0].root), NULL);}
-#line 1773 "y.tab.c" /* yacc.c:1646  */
+#line 1805 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 271 "stage5_yacc.y" /* yacc.c:1646  */
+#line 293 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree('*', INTEGER, NULL, ARITHOP, (yyvsp[-2].root), (yyvsp[0].root), NULL);}
-#line 1779 "y.tab.c" /* yacc.c:1646  */
+#line 1811 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 272 "stage5_yacc.y" /* yacc.c:1646  */
+#line 294 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree('/', INTEGER, NULL, ARITHOP, (yyvsp[-2].root), (yyvsp[0].root), NULL);}
-#line 1785 "y.tab.c" /* yacc.c:1646  */
+#line 1817 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 273 "stage5_yacc.y" /* yacc.c:1646  */
+#line 295 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree('%', INTEGER, NULL, ARITHOP, (yyvsp[-2].root), (yyvsp[0].root), NULL);}
-#line 1791 "y.tab.c" /* yacc.c:1646  */
+#line 1823 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 274 "stage5_yacc.y" /* yacc.c:1646  */
+#line 296 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = (yyvsp[-1].root);}
-#line 1797 "y.tab.c" /* yacc.c:1646  */
+#line 1829 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 275 "stage5_yacc.y" /* yacc.c:1646  */
+#line 297 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = (yyvsp[0].root);}
-#line 1803 "y.tab.c" /* yacc.c:1646  */
+#line 1835 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 276 "stage5_yacc.y" /* yacc.c:1646  */
+#line 298 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = (yyvsp[0].root);}
-#line 1809 "y.tab.c" /* yacc.c:1646  */
+#line 1841 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 277 "stage5_yacc.y" /* yacc.c:1646  */
+#line 299 "stage5_yacc.y" /* yacc.c:1646  */
     {
                                         // printf("LALA..!!!! in ID reduc....\n");
                                         // $1->GSTptr = lookUp($1->varname);   //finding and setting GSTptr
@@ -1824,11 +1856,11 @@ yyreduce:
                                         // printf("LALA..!!!! type is %d\n", $$->type);
                                         // printf("val of GSTptr is %p\n", $$->GSTptr);
                                       }
-#line 1828 "y.tab.c" /* yacc.c:1646  */
+#line 1860 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 291 "stage5_yacc.y" /* yacc.c:1646  */
+#line 313 "stage5_yacc.y" /* yacc.c:1646  */
     {
                                         // printf("LALALOLO..!!!! in ID[E] reduc....\n");
                                         // $1->GSTptr = lookUp($1->varname);   //finding and setting GSTptr
@@ -1850,71 +1882,71 @@ yyreduce:
                                         // printf("LALA..!!!! type is %d\n", $$->type);
                                         // printf("val of GSTptr is %p\n", $$->GSTptr);
                                       }
-#line 1854 "y.tab.c" /* yacc.c:1646  */
+#line 1886 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 314 "stage5_yacc.y" /* yacc.c:1646  */
+#line 336 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree(LT, BOOLEAN, NULL, RELOP, (yyvsp[-2].root), (yyvsp[0].root), NULL);}
-#line 1860 "y.tab.c" /* yacc.c:1646  */
+#line 1892 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 315 "stage5_yacc.y" /* yacc.c:1646  */
+#line 337 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree(GT, BOOLEAN, NULL, RELOP, (yyvsp[-2].root), (yyvsp[0].root), NULL);}
-#line 1866 "y.tab.c" /* yacc.c:1646  */
+#line 1898 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 316 "stage5_yacc.y" /* yacc.c:1646  */
+#line 338 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree(LE, BOOLEAN, NULL, RELOP, (yyvsp[-2].root), (yyvsp[0].root), NULL);}
-#line 1872 "y.tab.c" /* yacc.c:1646  */
+#line 1904 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 317 "stage5_yacc.y" /* yacc.c:1646  */
+#line 339 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree(GE, BOOLEAN, NULL, RELOP, (yyvsp[-2].root), (yyvsp[0].root), NULL);}
-#line 1878 "y.tab.c" /* yacc.c:1646  */
+#line 1910 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 318 "stage5_yacc.y" /* yacc.c:1646  */
+#line 340 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree(EQ, BOOLEAN, NULL, RELOP, (yyvsp[-2].root), (yyvsp[0].root), NULL);}
-#line 1884 "y.tab.c" /* yacc.c:1646  */
+#line 1916 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 319 "stage5_yacc.y" /* yacc.c:1646  */
+#line 341 "stage5_yacc.y" /* yacc.c:1646  */
     {(yyval.root) = createTree(NE, BOOLEAN, NULL, RELOP, (yyvsp[-2].root), (yyvsp[0].root), NULL);}
-#line 1890 "y.tab.c" /* yacc.c:1646  */
+#line 1922 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 321 "stage5_yacc.y" /* yacc.c:1646  */
+#line 343 "stage5_yacc.y" /* yacc.c:1646  */
     {}
-#line 1896 "y.tab.c" /* yacc.c:1646  */
+#line 1928 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 322 "stage5_yacc.y" /* yacc.c:1646  */
+#line 344 "stage5_yacc.y" /* yacc.c:1646  */
     {}
-#line 1902 "y.tab.c" /* yacc.c:1646  */
+#line 1934 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 326 "stage5_yacc.y" /* yacc.c:1646  */
+#line 348 "stage5_yacc.y" /* yacc.c:1646  */
     {}
-#line 1908 "y.tab.c" /* yacc.c:1646  */
+#line 1940 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 327 "stage5_yacc.y" /* yacc.c:1646  */
+#line 349 "stage5_yacc.y" /* yacc.c:1646  */
     {}
-#line 1914 "y.tab.c" /* yacc.c:1646  */
+#line 1946 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1918 "y.tab.c" /* yacc.c:1646  */
+#line 1950 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2142,7 +2174,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 329 "stage5_yacc.y" /* yacc.c:1906  */
+#line 351 "stage5_yacc.y" /* yacc.c:1906  */
 
 
 
