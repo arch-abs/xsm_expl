@@ -2188,6 +2188,8 @@ int main(int argc, char* argv[]){
     line = 1;
     yyin = fopen(argv[1], "r");
 
+    installFunc("main", INTEGER, NULL);
+
     yyparse();
     return 0;
 }

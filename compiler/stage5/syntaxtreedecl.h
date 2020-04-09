@@ -14,6 +14,10 @@
 #define BOOLEAN 4      //for type
 
 #define IFBODY 5
+
+#define ARGLIST 6
+#define FUNCCALL 7
+
 // #define LT 4        //type for <
 // #define GT 5        //type for >
 // #define LE 6        //type for <=
@@ -38,22 +42,55 @@ struct paramListNode
 typedef struct paramListNode* paramList;
 
 
-struct Gsymbol{
 
+struct SymbolTable{     //Common Structure for both GST and LST
+//*****for GST*****
     // * Identify Array as size >= 1  AND  param == NULL
     // * Identify simple VAR as size == 1  AND  param == NULL
     // * Identify FUNC as size = -1
 
+//*****for LST*****
+    // * Only simple VARS and not array or func can be declared locally
+    // * No need of size as always, as arrays not allowed STILL we will set it as one
 
-    char* name;                 // name of the variable
-    int type;                   // type of the variable
-    int size;                   // <<USED ONLY FOR VARs>> size of the type of the variable
-    int binding;                // stores the STATIC memory address allocated to the VAR  or LABEL binding num for FUNC...in form of <F NUM  
-    paramList param;            // <<USED_ONLY_FOR_FUNC>> parameter list associated with function
-    struct Gsymbol* next;       // pointer to next entry in the symbol table
+
+    char* name;                     // name of the variable
+    int type;                       // type of the variable
+    int size;                       // <<USED ONLY FOR VARs>> size of the type of the variable
+    int binding;                    // stores the STATIC memory address allocated to the VAR  or LABEL binding num for FUNC...in form of <F NUM>
+                                    // and RELATIVE binding in case of LOCAL VARS.  
+    paramList param;                // <<USED_ONLY_FOR_FUNC>> parameter list associated with function
+    struct SymbolTable* next;       // pointer to next entry in the symbol table
 };
-typedef struct Gsymbol* Gsymbol_entry;
+typedef struct SymbolTable* SymbolTableEntry;
 
+// struct Gsymbol{
+
+//     // * Identify Array as size >= 1  AND  param == NULL
+//     // * Identify simple VAR as size == 1  AND  param == NULL
+//     // * Identify FUNC as size = -1
+
+
+//     char* name;                 // name of the variable
+//     int type;                   // type of the variable
+//     int size;                   // <<USED ONLY FOR VARs>> size of the type of the variable
+//     int binding;                // stores the STATIC memory address allocated to the VAR  or LABEL binding num for FUNC...in form of <F NUM  
+//     paramList param;            // <<USED_ONLY_FOR_FUNC>> parameter list associated with function
+//     struct Gsymbol* next;       // pointer to next entry in the symbol table
+// };
+// typedef struct Gsymbol* Gsymbol_entry;
+
+// struct Lsymbol{
+
+//     // * Only simple VARS and not array or func can be declared locally
+//     // * No need of size as always  ! as arrays not allowed
+
+//     char* name;                 // name of the variable
+//     int type;                   // type of the variable
+//     int binding;                // stores the STATIC memory address allocated to the VAR  or LABEL binding num for FUNC...in form of <F NUM  
+//     struct Lsymbol* next;       // pointer to next entry in the symbol table
+// };
+// typedef struct Lsymbol* Lsymbol_entry;
 
 struct tnode{
     int val;    // val stores index of value to dereference in ID node_type
@@ -65,7 +102,7 @@ struct tnode{
     struct tnode* left;
     struct tnode* right;
 
-    Gsymbol_entry GSTptr;
+    SymbolTableEntry STptr;
     
 };
 typedef struct tnode* node;
@@ -82,4 +119,4 @@ char *substr(char *string, int position, int length);  //substr function
 int codeGenAuxillary(node root, FILE* fw);
 int codeGen(node root);
 
-node createTree(int val, int type, char* varname, int nodetype, node left, node right, Gsymbol_entry GSTptr);       //varname arg will refer to str_val arg in case of STR_LITERAL
+node createTree(int val, int type, char* varname, int nodetype, node left, node right, SymbolTableEntry STptr);       //varname arg will refer to str_val arg in case of STR_LITERAL

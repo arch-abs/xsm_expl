@@ -72,8 +72,14 @@
 
     
 
-    GdeclBlock  :   DECL GdeclList ENDDECL         {printGsymbolTable();}
-                    | DECL ENDDECL                 {printGsymbolTable();}
+    GdeclBlock  :   DECL GdeclList ENDDECL          {
+                                                        installFunc("main", INTEGER, NULL);
+                                                        printGsymbolTable();
+                                                    }
+                    | DECL ENDDECL                  {
+                                                        installFunc("main", INTEGER, NULL);
+                                                        printGsymbolTable();
+                                                    }
                     ;
 
     GdeclList    :   GdeclList GDecl               {}
@@ -116,11 +122,27 @@
                     | FDef                      {}
                     ;
 
-    FDef        :   Type ID '(' ParamList ')' '{' LDeclBlock Body '}'   {
+    FDef        :   Type ID '(' ParamList ')' '{' LDeclBlock Body '}'   {   
+
+                                                                            checkEquivalenceParamDeclDef($2->varname, paramHeadPtr, getType(), $8);     //NAME_TYPE_CHK of decl and def of fn
+                                                                            setupLSTBinding($2->varname);
+
                                                                             paramHeadPtr = NULL;
+                                                                            //might also need to free LST and and AST of func here
+                                                                            Lsymbol_head = NULL;
+
+                                                                            popType();
                                                                         }      //Note that body is necessary as we need to have a return statement atleast as void returntype is not allowed
+                    
                     |Type ID '('  ')' '{' LDeclBlock Body '}'           {
+                                                                            checkEquivalenceParamDeclDef($2->varname, paramHeadPtr, getType());
+                                                                            setupLSTBinding(char* funcName);
+
+                                                                            //might also need to free LST and and AST of func here
+                                                                            Lsymbol_head = NULL;
                                                                             paramHeadPtr = NULL;
+
+                                                                            popType();
                                                                         }
                     // |Type ID '(' ParamList ')' '{' Body '}'             {}   //LDeclBlock mandatory in Fdef
                     // |Type ID '('  ')' '{' Body '}'                      {}
@@ -152,8 +174,14 @@
 
 
 
-    LDeclBlock  :   DECL LDecList ENDDECL       {}
-                    | DECL ENDDECL              {}   //will print nothing as empty GST
+    LDeclBlock  :   DECL LDecList ENDDECL       {
+                                                    addParamToLST(paramHeadPtr);
+                                                    printLsymbolTable();
+                                                }
+
+                    | DECL ENDDECL              {
+                                                    printLsymbolTable();
+                                                }   //will print nothing as empty GST
                     ;
 
     LDecList    :   LDecList LDecl               {}
@@ -165,8 +193,8 @@
                                                }
                     ;
 
-    IdList      :   IdList ',' ID              {}
-                    | ID                       {}
+    IdList      :   IdList ',' ID              {installLId($3->varname, getType())}
+                    | ID                       {installLId($1->varname, getType())}
                     ;
 
 
@@ -206,8 +234,13 @@
 
 
 
-    Body    :       _BEGIN Slist RETURN E ';' END          {}
-                    | _BEGIN RETURN E ';' END              {}
+    Body    :       _BEGIN Slist RETURN E ';' END           {
+                                                                $$ = createTree(-1, CONNECTOR, NULL, CONNECTOR, $2, createTree(-1, RETURN, NULL, RETURN, $4, NULL, NULL), NULL);
+                                                            }
+
+                    | _BEGIN RETURN E ';' END               {
+                                                                $$ = createTree(-1, RETURN, NULL, RETURN, $4, NULL, NULL);
+                                                            }
                     ;
 
     Slist   :       Slist Stmt      {$$ = createTree(-1, CONNECTOR, NULL, CONNECTOR, $1, $2, NULL);}
@@ -224,9 +257,9 @@
                     ;
 
     InputStmt:      READ '(' ID ')' ';'         {
-                                                    // $3->GSTptr = lookUp($3->varname);   //finding and setting GSTptr
+                                                    // $3->STptr = lookUp($3->varname);   //finding and setting STptr
 
-                                                    // $3->type = ($3->GSTptr)->type;      //setting type from GSTptr
+                                                    // $3->type = ($3->STptr)->type;      //setting type from STptr
 
                                                     // $$ = createTree(-1, READ, NULL, READ, $3, NULL, NULL);
                                                     
@@ -234,9 +267,9 @@
 
 
                     |READ '(' ID '[' E ']' ')' ';'         {
-                                                    // $3->GSTptr = lookUp($3->varname);   //finding and setting GSTptr
+                                                    // $3->STptr = lookUp($3->varname);   //finding and setting STptr
 
-                                                    // $3->type = ($3->GSTptr)->type;      //setting type from GSTptr
+                                                    // $3->type = ($3->STptr)->type;      //setting type from STptr
                                                     // $3->left = $5;
                                                     // if ($3->left->type != INTEGER)     //TYPE_CHK
                                                     // {
@@ -253,16 +286,16 @@
                     ;
 
     AssgStmt    :   ID '=' E ';'                {
-                                                    // $1->GSTptr = lookUp($1->varname);   //finding and setting GSTptr
+                                                    // $1->STptr = lookUp($1->varname);   //finding and setting STptr
 
-                                                    // $1->type = ($1->GSTptr)->type;      //setting type from GSTptr
+                                                    // $1->type = ($1->STptr)->type;      //setting type from STptr
                                                     
                                                     // $$ = createTree('=', '=', NULL, ASSGNOP, $1, $3, NULL);
                                                 }
                     | ID'[' E ']' '=' E ';'     {
-                                                    // $1->GSTptr = lookUp($1->varname);   //finding and setting GSTptr
+                                                    // $1->STptr = lookUp($1->varname);   //finding and setting STptr
 
-                                                    // $1->type = ($1->GSTptr)->type;      //setting type from GSTptr
+                                                    // $1->type = ($1->STptr)->type;      //setting type from STptr
                                                     // // $1->val = $3->val;
 
                                                     // $1->left = $3;
@@ -298,27 +331,27 @@
                     | STRING_LITERAL  {$$ = $1;}        //printf("str found...\n");
                     | ID              {
                                         // printf("LALA..!!!! in ID reduc....\n");
-                                        // $1->GSTptr = lookUp($1->varname);   //finding and setting GSTptr
-                                        // // if($1->GSTptr == NULL)
+                                        // $1->STptr = lookUp($1->varname);   //finding and setting STptr
+                                        // // if($1->STptr == NULL)
                                         // // {
                                         // //     printf("%%$##@@@#$#\n");
                                         // //     exit(1);
                                         // // }
-                                        // $1->type = ($1->GSTptr)->type;      //setting type from GSTptr
+                                        // $1->type = ($1->STptr)->type;      //setting type from STptr
                                         // $$ = $1;
-                                        // printf("LALA..!!!! varname is %s\n", $$->GSTptr->name);
+                                        // printf("LALA..!!!! varname is %s\n", $$->STptr->name);
                                         // printf("LALA..!!!! type is %d\n", $$->type);
-                                        // printf("val of GSTptr is %p\n", $$->GSTptr);
+                                        // printf("val of STptr is %p\n", $$->STptr);
                                       }
                     | ID'['E']'     {
                                         // printf("LALALOLO..!!!! in ID[E] reduc....\n");
-                                        // $1->GSTptr = lookUp($1->varname);   //finding and setting GSTptr
-                                        // // if($1->GSTptr == NULL)
+                                        // $1->STptr = lookUp($1->varname);   //finding and setting STptr
+                                        // // if($1->STptr == NULL)
                                         // // {
                                         // //     printf("%%$##@@@#$#\n");
                                         // //     exit(1);
                                         // // }
-                                        // $1->type = ($1->GSTptr)->type;      //setting type from GSTptr
+                                        // $1->type = ($1->STptr)->type;      //setting type from STptr
                                         // // $1->val = $3->val;
                                         // $1->left = $3;
                                         // if ($1->left->type != INTEGER)     //TYPE_CHK
@@ -327,9 +360,9 @@
                                         //     exit(0);
                                         // }
                                         // $$ = $1;
-                                        // printf("LALA..!!!! varname is %s\n", $$->GSTptr->name);
+                                        // printf("LALA..!!!! varname is %s\n", $$->STptr->name);
                                         // printf("LALA..!!!! type is %d\n", $$->type);
-                                        // printf("val of GSTptr is %p\n", $$->GSTptr);
+                                        // printf("val of STptr is %p\n", $$->STptr);
                                       }
                         
 
@@ -340,13 +373,28 @@
                     | E EQ E          {$$ = createTree(EQ, BOOLEAN, NULL, RELOP, $1, $3, NULL);}
                     | E NE E          {$$ = createTree(NE, BOOLEAN, NULL, RELOP, $1, $3, NULL);}
                     
-                    | ID '(' ArgList ')'    {}
-                    | ID '(' ')'            {}
+                    | ID '(' ArgList ')'    {
+                                                $1->STptr = lookUp($1->varname, 1);
+                                                $1->type = ($1->STptr)->type;      //setting type from STptr
+
+                                                $$ = createTree(-1, $1->type, $1->varname, FUNCCALL, $1, $3, NULL);
+                                            }
+
+                    | ID '(' ')'            {
+                                                $1->STptr = lookUp($1->varname, 1);
+                                                $1->type = ($1->STptr)->type;      //setting type from STptr
+
+                                                $$ = createTree(-1, $1->type, $1->varname, FUNCCALL, $1, NULL, NULL);
+                                            }
                     ;
 
 
-    ArgList :       ArgList ',' E           {}
-                    | E                     {}
+    ArgList :       ArgList ',' E           {
+
+                                                $$ = createTree(-1, $3->type, NULL, ARGLIST, $3, $1, NULL);
+                                            }
+                    
+                    | E                     {$$ = createTree(-1, $1->type, NULL, ARGLIST, $1, NULL, NULL);}
                     ;
 %%
 
@@ -360,6 +408,8 @@ void yyerror(const char *s){
 int main(int argc, char* argv[]){
     line = 1;
     yyin = fopen(argv[1], "r");
+
+    // installFunc("main", INTEGER, NULL);
 
     yyparse();
     return 0;
