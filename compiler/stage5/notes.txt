@@ -51,9 +51,9 @@ VarList
 
 
 
-clarify if defn of al func that have been defined is mandatory
+clarify if defn of a func that have been defined is mandatory
 
-TYPE_CHK that whether actual return expression provided matches the type of func defined while decl
+    TYPE_CHK that whether actual return expression provided matches the type of func defined while decl
 
 Remember to make regCount to 0 before generating code for each function
 
@@ -63,33 +63,39 @@ LATER do by storing in a stack and srartimg all codegen at the end.... so that O
 
 **Alter reg PUSH while backup to full 20 and avoid resetting regCount to 0 for expr evaluation for args after backup of REGS 
 
+might need to alter with regcount setting to 0 while arg eval
+
 [SOLVED]add support for checking only INT and STR type in func PARAMS and ARGS
-    --Soln is that it is not needed as lex analyser will itself not be able to parse bolean as it is not a token 
+    --Soln is that it is not needed as lex analyser will itself not be able to parse boolean as it is not a token 
 
 
-call ARGS_CHK func inside the createTree for func_node
 
-can make use of parse stack if use same struct as tree node for PARAMlst etc
 
-type check on NAME and Num of func args while defn and while usage
 
-if needed add a func getBindingAddress
 
-put PARAMs as VARS in LSt
+    call ARGS_CHK func inside the createTree for func_node
+
+    can make use of parse stack if use same struct as tree node for PARAMlst etc
+
+    type check on NAME and Num of func args while defn and while usage
+
+    if needed add a func getBindingAddress
+
+    put PARAMs as VARS in LSt
 
 Dont forget the main functiom
 
 do things for main func too
 
 
-put args also in LST and assign values to them from expressions in ArgsList
+    put args also in LST and assign values to them from expressions in ArgsList
 
 
 what will happen if the name of a Local VAR is same as a FUNC declared also array... [take care while desiging lookup] 
 
 Remember to free AST and LST after func codegen
 
-mod lookup to take care of both GST and LST
+    mod lookup to take care of both GST and LST
 
 implement binding in Lid later
 
@@ -98,5 +104,5 @@ revoke comments in ARTHOP, RELOP and if
 
 !!!!!......  REMEBER expl allows RETURN statement ONLY at LAST  ...!!!!!!
 
-**Remember to remove INT10 syscall call form codeGen and put inside codeGen for MAIN() func (on return 0 stmt)
+***Remember to remove INT10 syscall call form codeGen and put inside codeGen for MAIN() func (on return 0 stmt)
 

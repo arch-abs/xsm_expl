@@ -58,7 +58,8 @@ struct SymbolTable{     //Common Structure for both GST and LST
     int type;                       // type of the variable
     int size;                       // <<USED ONLY FOR VARs>> size of the type of the variable
     int binding;                    // stores the STATIC memory address allocated to the VAR  or LABEL binding num for FUNC...in form of <F NUM>
-                                    // and RELATIVE binding in case of LOCAL VARS.  
+                                    // and RELATIVE binding in case of LOCAL VARS.
+    char LocGlobIndicator;
     paramList param;                // <<USED_ONLY_FOR_FUNC>> parameter list associated with function
     struct SymbolTable* next;       // pointer to next entry in the symbol table
 };

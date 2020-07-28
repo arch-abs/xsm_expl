@@ -1,14 +1,16 @@
     #include <string.h>
     // MIGHT NEED TO INCLUDE exprtreedecl.h here
-    #include "syntaxtreedecl.h"
+    // #include "syntaxtreedecl.h"
     #include "y.tab.h"
 
     int regCount = 0; //might need to change this to array based in future
     int lblCount = -1;
-    int funcLblCount = -1;
+    int funcLblCount = 0;   // F0 is reserved for main
 
     int loop_stack_count = -1;
     int type_stack_count = -1;
+
+    int isInitCodeGenerated = 0;
 
     // int TYPE;
 
@@ -24,8 +26,7 @@
 
     SymbolTableEntry Lsymbol_head = NULL;      //ptr for LST of Func being CURRENTLY PROCESSED
 
-
-
+    
 
     int getFreeReg()
     {
@@ -157,8 +158,10 @@
             SymbolTableEntry tmp = Lsymbol_head;
             while (tmp != NULL)
             {
-                if (strcmp(tmp->name, name) == 0)
+                if (strcmp(tmp->name, name) == 0){
+                    // LocGlobBindinbFlag = 'L';
                     return tmp;
+                }
                 tmp = tmp->next;
             }
         }
@@ -173,8 +176,10 @@
         SymbolTableEntry tmp = Gsymbol_head;
         while (tmp != NULL)
         {
-            if (strcmp(tmp->name, name) == 0)
+            if (strcmp(tmp->name, name) == 0){
+                // LocGlobBindinbFlag = 'L';
                 return tmp;
+            }
             tmp = tmp->next;
         }
 
@@ -183,14 +188,14 @@
     }
 
 
-    SymbolTableEntry createSymbolTableNode(char* name, int type, int size, paramList param){
+    SymbolTableEntry createSymbolTableNode(char* name, int type, int size, paramList param, char LocGlobIndicator){
         SymbolTableEntry new = (SymbolTableEntry)malloc(sizeof(struct SymbolTable));
         new->name = name;
         new->type = type;
         new->size = size;
         new->param = param;
         new->next = NULL;
-
+        new->LocGlobIndicator = LocGlobIndicator;
         return new;
     }
 
@@ -204,7 +209,7 @@
         // new->param = NULL;
         // new->next = NULL;
 
-        SymbolTableEntry new = createSymbolTableNode(name, type, size, NULL);
+        SymbolTableEntry new = createSymbolTableNode(name, type, size, NULL, 'G');
 
         SymbolTableEntry tmp = Gsymbol_head;
         if (tmp == NULL)
@@ -214,7 +219,7 @@
             Gsymbol_head = new;
         }
         else
-        {make
+        {
             long size_sum;
             size_sum = 0;
             while (tmp->next != NULL)
@@ -257,8 +262,11 @@
         // new->next = NULL;
 
 
-        SymbolTableEntry new = createSymbolTableNode(name, type, -1, param);
-        new->binding = getFuncLabel();
+        SymbolTableEntry new = createSymbolTableNode(name, type, -1, param, 'G');
+        if(strcmp(name, "main") == 0)
+            new->binding = 0;
+        else
+            new->binding = getFuncLabel();
 
 
         SymbolTableEntry tmp = Gsymbol_head;
@@ -297,7 +305,7 @@
         // new->size = 1;      //no need in LId but still assigning 1 to differetiate from func entires
         // new->next = NULL;
 
-        SymbolTableEntry new = createSymbolTableNode(name, type, 1, NULL);
+        SymbolTableEntry new = createSymbolTableNode(name, type, 1, NULL, 'L');
 
         SymbolTableEntry tmp = Lsymbol_head;
         if (tmp == NULL)
@@ -345,7 +353,7 @@
         ptr = NULL;
 
         while (tmp != NULL){
-            SymbolTableEntry new  = createSymbolTableNode(tmp->name, tmp->type, 1, NULL);
+            SymbolTableEntry new  = createSymbolTableNode(tmp->name, tmp->type, 1, NULL, 'L');
             if(head == NULL  ||  ptr == NULL){
                 head = new;
                 ptr = new;
@@ -368,6 +376,7 @@
 
     void setupLSTBinding(char* funcName){
         SymbolTableEntry ste = lookUp(funcName, 1);     //note that decl of function has been already been checked by checkEquivalenceParamDeclDef
+        printf("in LST binding of %s\n", funcName);
         if(ste != NULL){
             int i;
             paramList tmp = ste->param;
@@ -434,6 +443,8 @@
                     i = 0;
                     break;
                 }
+                tmp1 = tmp1->next;
+                tmp2 = tmp2->next;
             }
 
             if((tmp1 == NULL && tmp2!=NULL)  || (tmp1 != NULL && tmp2==NULL))
@@ -459,19 +470,25 @@
 
 
 
-    int checkEquivalenceParamArg(char* funcName, SymbolTableEntry argList){
+    int checkEquivalenceParamArg(char* funcName, node argList){
+        paramList funcParamListPtr;
         paramList tmp1;
         node tmp2;
         
-        int ParamListSize = 0;
-        
-        tmp1 = paramHeadPtr;
-        while(tmp1 != NULL)
-            ParamListSize++;
+        funcParamListPtr= lookUp(funcName, 1)->param;
 
+        int ParamListSize = 0;
+
+
+        tmp1 = funcParamListPtr;
+        while(tmp1 != NULL){
+            ParamListSize++;
+            tmp1 = tmp1->next;  
+        }
+    
         tmp2 = argList;
         for(; ParamListSize > 0; ParamListSize--){
-            tmp1 = paramHeadPtr;
+            tmp1 = funcParamListPtr;
             for(int j=1; j<ParamListSize; j++)
                 tmp1 = tmp1->next;
             if(tmp2 == NULL /*and implicitly tmp1!=NULL*/){        //NOTE: inside tmp1 will not be NULL (as we have aleady clculated oits sie and going in reverse order)
@@ -628,8 +645,8 @@
             (tmp->type) = type;          //<<<<<<<<<>>>>>>>>>>!!!!!!!!!! MAY NEED TO CHANGE LATER !!!!!!!!!!<<<<<<<<>>>>>>>>>
             tmp->varname = strdup(varname); //try removing dereferencing and see what happens
             tmp->nodetype = ID;
-            tmp->left = NULL;
-            tmp->right = NULL;
+            tmp->left = left;
+            tmp->right = right;
             tmp->str_val = NULL;
             tmp->STptr = NULL;
             break;
@@ -1014,7 +1031,7 @@
         //Wirting code to call EXIT func from library
         reg = getFreeReg();
         fprintf(fw, "MOV R%d, \"Exit\"\n", reg);
-        fprintf(fw, "PUSH R%d\n", in Dis reg);
+        fprintf(fw, "PUSH R%d\n", reg);
         fprintf(fw, "PUSH R%d\n", reg);
         fprintf(fw, "PUSH R%d\n", reg);
         fprintf(fw, "PUSH R%d\n", reg);
@@ -1034,265 +1051,54 @@
     int codeGenAuxillary(node root, FILE *fw)
     { //written in pre-order form so, l will bw lower and r will be greater REG
         int l, r, reg, lbl1, lbl2;
+        int i, regCountBackup;
         char c;
 
         
+        if(root != NULL)
+            switch (root->nodetype)
+            {
+            case NUM:
+                reg = getFreeReg();
+                fprintf(fw, "MOV R%d, %d\n", reg, root->val);
+                return reg;
+                break;
 
-        switch (root->nodetype)
-        {
-        case NUM:
-            reg = getFreeReg();
-            fprintf(fw, "MOV R%d, %d\n", reg, root->val);
-            return reg;
-            break;
+            case STRING_LITERAL:
+                reg = getFreeReg();
+                fprintf(fw, "MOV R%d, \"%s\"\n", reg, root->str_val);
+                return reg;
+                break;
 
-        case STRING_LITERAL:
-            reg = getFreeReg();
-            fprintf(fw, "MOV R%d, \"%s\"\n", reg, root->str_val);
-            return reg;
-            break;
+            case ID:
 
-        case ID:
+                reg = getFreeReg();
+                fprintf(fw, "MOV R%d, %d\n", reg, (root->STptr)->binding);
+                if(root->STptr->LocGlobIndicator == 'L')
+                    fprintf(fw, "ADD R%d, BP\n", reg);
 
-            reg = getFreeReg();
-            fprintf(fw, "MOV R%d, %d\n", reg, (root->STptr)->binding);
-
-            if(isPresentInLST(root->varname)==1  &&  root->left == NULL){      //to check is ID is a LOCAL var and not of type array(to deal with case when both local and global with same name but global is array)
-                fprintf(fw, "ADD R%d, BP\n", reg);
-            }
-            else{
-                if(root->left != NULL)      //condition when ID is of array type
-                {
-                    l = codeGenAuxillary(root->left, fw);
-                    if (root->left->nodetype == ID)
+                // if(isPresentInLST(root->varname)==1  &&  root->left == NULL){      //to check is ID is a LOCAL var and not of type array(to deal with case when both local and global with same name but global is array)
+                //     fprintf(fw, "ADD R%d, BP\n", reg);
+                // }
+                else{
+                    if(root->left != NULL)      //condition when ID is of array type
                     {
-                        //reg = getFreeReg();
-                        fprintf(fw, "MOV R%d, [R%d]\n", l, l);
-                        //l = reg;
+                        l = codeGenAuxillary(root->left, fw);
+                        if (root->left->nodetype == ID)
+                        {
+                            //reg = getFreeReg();
+                            fprintf(fw, "MOV R%d, [R%d]\n", l, l);
+                            //l = reg;
+                        }
+                        fprintf(fw, "ADD R%d, R%d\n", reg, l);
+                        freeReg();
                     }
-                    fprintf(fw, "ADD R%d, R%d\n", reg, l);
-                    freeReg();
                 }
-            }
 
-            return reg;
-            break;
-
-        case ARITHOP:
-            l = codeGenAuxillary(root->left, fw);
-            if (root->left->nodetype == ID)
-            {
-                //reg = getFreeReg();
-                fprintf(fw, "MOV R%d, [R%d]\n", l, l);
-                //l = reg;
-            }
-
-            r = codeGenAuxillary(root->right, fw);
-            if (root->right->nodetype == ID)
-            {
-                //reg = getFreeReg();
-                fprintf(fw, "MOV R%d, [R%d]\n", r, r);
-                //r = reg;
-            }
-            c = (root->val);
-            switch (c)
-            {
-            case '+':
-                //printf("lala...here_3\n");
-                fprintf(fw, "ADD R%d, R%d\n", l, r);
+                return reg;
                 break;
-            case '-':
-                fprintf(fw, "SUB R%d, R%d\n", l, r);
-                break;
-            case '*':
-                fprintf(fw, "MUL R%d, R%d\n", l, r);
-                break;
-            case '/':
-                fprintf(fw, "DIV R%d, R%d\n", l, r);
-                break;
-            case '%':
-                fprintf(fw, "MOD R%d, R%d\n", l, r);
-                break;
-            default:
-                printf("Error!!!! in codeGenARITHOP op switch case\n");
-                fclose(fw);
-                //close the file pointer;
-                exit(0);
-                break;
-            }
-            freeReg();
-            return l;
-            break;
 
-        case RELOP:
-            l = codeGenAuxillary(root->left, fw);
-            if (root->left->nodetype == ID)
-            {
-                //reg = getFreeReg();
-                fprintf(fw, "MOV R%d, [R%d]\n", l, l);
-                //l = reg;
-            }
-
-            r = codeGenAuxillary(root->right, fw);
-            if (root->right->nodetype == ID)
-            {
-                //reg = getFreeReg();
-                fprintf(fw, "MOV R%d, [R%d]\n", r, r);
-                //l = reg;
-            }
-            switch (root->val)
-            {
-            case LT:
-                fprintf(fw, "LT R%d, R%d\n", l, r);
-                break;
-            case GT:
-                fprintf(fw, "GT R%d, R%d\n", l, r);
-                break;
-            case LE:
-                fprintf(fw, "LE R%d, R%d\n", l, r);
-                break;
-            case GE:
-                fprintf(fw, "GE R%d, R%d\n", l, r);
-                break;
-            case EQ:
-                //printf("lala...here\n");
-                fprintf(fw, "EQ R%d, R%d\n", l, r);
-                break;
-            case NE:
-                fprintf(fw, "NE R%d, R%d\n", l, r);
-                break;
-            default:
-                printf("Error!!!! in codeGenRELOP op switch case\n");
-                fclose(fw);
-                //close the file pointer;
-                exit(0);
-                break;
-            }
-            freeReg();
-            return l;
-            break;
-
-        case ASSGNOP:
-            l = codeGenAuxillary(root->left, fw);
-            r = codeGenAuxillary(root->right, fw);
-
-            if (root->right->nodetype == ID)
-            {
-                //reg = getFreeReg();
-                fprintf(fw, "MOV R%d, [R%d]\n", r, r);
-                //l = reg;
-            }
-
-            fprintf(fw, "MOV [R%d], R%d\n", l, r);
-
-            freeReg();
-            freeReg();          //-------------->>>>>>>>>!!!MIGHT NEED TO REMOVE!!!<<<<<<<<<<<<-----------
-            return l; //returning l arbirarily as no use of it
-            break;
-
-        case READ:
-            l = codeGenAuxillary(root->left, fw);
-
-            reg = getFreeReg();
-            fprintf(fw, "MOV R%d, \"Read\"\n", reg);
-            fprintf(fw, "PUSH R%d\n", reg);
-            fprintf(fw, "MOV R%d, -1\n", reg);
-            fprintf(fw, "PUSH R%d\n", reg);
-            //fprintf(fw, "MOV R%d, %d\n", reg, (l - 'a' + 4096));
-            fprintf(fw, "PUSH R%d\n", l);
-            fprintf(fw, "PUSH R%d\n", reg);
-            fprintf(fw, "PUSH R%d\n", reg);
-            fprintf(fw, "CALL 0\n");
-            fprintf(fw, "POP R%d\n", reg);
-            fprintf(fw, "POP R%d\n", reg);
-            fprintf(fw, "POP R%d\n", reg);
-            fprintf(fw, "POP R%d\n", reg);
-            fprintf(fw, "POP R%d\n", reg);
-
-            freeReg();
-            freeReg();      //-------------->>>>>>>>>!!!MIGHT NEED TO REMOVE!!!<<<<<<<<<<<<-----------
-
-            return l;       //returning l arbirarily as no use of it
-            break;
-
-        case WRITE:
-            l = codeGenAuxillary(root->left, fw);
-
-            if (root->left->nodetype == ID)
-            {
-                //reg = getFreeReg();
-                fprintf(fw, "MOV R%d, [R%d]\n", l, l);
-                //l = reg;
-            }
-
-            reg = getFreeReg();
-            fprintf(fw, "MOV R%d, \"Write\"\n", reg);
-            fprintf(fw, "PUSH R%d\n", reg);
-            fprintf(fw, "MOV R%d, -2\n", reg);
-            fprintf(fw, "PUSH R%d\n", reg);
-            // fprintf(fw, "MOV R%d, R%d", reg, (l-'a'+4096));
-            fprintf(fw, "PUSH R%d\n", l);
-            fprintf(fw, "PUSH R%d\n", reg);
-            fprintf(fw, "PUSH R%d\n", reg);
-            fprintf(fw, "CALL 0\n");
-            fprintf(fw, "POP R%d\n", reg);
-            fprintf(fw, "POP R%d\n", reg);
-            fprintf(fw, "POP R%d\n", reg);
-            fprintf(fw, "POP R%d\n", reg);
-            fprintf(fw, "POP R%d\n", reg);
-
-            freeReg();
-            freeReg();
-            return l; //returning l arbirarily as no use of it
-            break;
-
-        case IF:
-            lbl1 = getLabel();
-            lbl2 = getLabel();
-            l = codeGenAuxillary(root->left, fw);
-            fprintf(fw, "JZ R%d, L%d\n", l, lbl1);
-            r = codeGenAuxillary((root->right)->left, fw);
-            fprintf(fw, "JMP L%d\n", lbl2);
-            fprintf(fw, "L%d:\n", lbl1);
-            if ((root->right)->right != NULL)
-                r = codeGenAuxillary((root->right)->right, fw);
-            fprintf(fw, "L%d:\n", lbl2);
-
-            freeReg();
-            // freeReg();      //.....>>> MIGHT NEED TO REMOVE <<<<-------------------
-            break;
-
-        case WHILE:
-            lbl1 = getLabel();
-            lbl2 = getLabel();
-            pushLoop();
-            loop_stack[0][loop_stack_count] = lbl1;
-            loop_stack[1][loop_stack_count] = lbl2;
-            fprintf(fw, "L%d:\n", lbl1);
-            l = codeGenAuxillary(root->left, fw);
-            fprintf(fw, "JZ R%d, L%d\n", l, lbl2);
-            r = codeGenAuxillary(root->right, fw);
-            fprintf(fw, "JMP L%d\n", lbl1);
-            fprintf(fw, "L%d:\n", lbl2);
-
-            popLoop();
-            freeReg();
-            break;
-
-        case BREAK:
-            if (loop_stack_count >= 0)
-                fprintf(fw, "JMP L%d\n", loop_stack[1][loop_stack_count]);
-            break;
-
-        case CONT:
-            if (loop_stack_count >= 0)
-                fprintf(fw, "JMP L%d\n", loop_stack[0][loop_stack_count]);
-            break;
-
-
-        case ARGLIST:
-
-            if(root != NULL){
+            case ARITHOP:
                 l = codeGenAuxillary(root->left, fw);
                 if (root->left->nodetype == ID)
                 {
@@ -1301,78 +1107,411 @@
                     //l = reg;
                 }
 
+                r = codeGenAuxillary(root->right, fw);
+                if (root->right->nodetype == ID)
+                {
+                    //reg = getFreeReg();
+                    fprintf(fw, "MOV R%d, [R%d]\n", r, r);
+                    //r = reg;
+                }
+                c = (root->val);
+                switch (c)
+                {
+                case '+':
+                    //printf("lala...here_3\n");
+                    fprintf(fw, "ADD R%d, R%d\n", l, r);
+                    break;
+                case '-':
+                    fprintf(fw, "SUB R%d, R%d\n", l, r);
+                    break;
+                case '*':
+                    fprintf(fw, "MUL R%d, R%d\n", l, r);
+                    break;
+                case '/':
+                    fprintf(fw, "DIV R%d, R%d\n", l, r);
+                    break;
+                case '%':
+                    fprintf(fw, "MOD R%d, R%d\n", l, r);
+                    break;
+                default:
+                    printf("Error!!!! in codeGenARITHOP op switch case\n");
+                    fclose(fw);
+                    //close the file pointer;
+                    exit(0);
+                    break;
+                }
+                freeReg();
+                return l;
+                break;
+
+            case RELOP:
+                l = codeGenAuxillary(root->left, fw);
+                if (root->left->nodetype == ID)
+                {
+                    //reg = getFreeReg();
+                    fprintf(fw, "MOV R%d, [R%d]\n", l, l);
+                    //l = reg;
+                }
+
+                r = codeGenAuxillary(root->right, fw);
+                if (root->right->nodetype == ID)
+                {
+                    //reg = getFreeReg();
+                    fprintf(fw, "MOV R%d, [R%d]\n", r, r);
+                    //l = reg;
+                }
+                switch (root->val)
+                {
+                case LT:
+                    fprintf(fw, "LT R%d, R%d\n", l, r);
+                    break;
+                case GT:
+                    fprintf(fw, "GT R%d, R%d\n", l, r);
+                    break;
+                case LE:
+                    fprintf(fw, "LE R%d, R%d\n", l, r);
+                    break;
+                case GE:
+                    fprintf(fw, "GE R%d, R%d\n", l, r);
+                    break;
+                case EQ:
+                    //printf("lala...here\n");
+                    fprintf(fw, "EQ R%d, R%d\n", l, r);
+                    break;
+                case NE:
+                    fprintf(fw, "NE R%d, R%d\n", l, r);
+                    break;
+                default:
+                    printf("Error!!!! in codeGenRELOP op switch case\n");
+                    fclose(fw);
+                    //close the file pointer;
+                    exit(0);
+                    break;
+                }
+                freeReg();
+                return l;
+                break;
+
+            case ASSGNOP:
+                l = codeGenAuxillary(root->left, fw);
+                r = codeGenAuxillary(root->right, fw);
+
+                if (root->right->nodetype == ID)
+                {
+                    //reg = getFreeReg();
+                    fprintf(fw, "MOV R%d, [R%d]\n", r, r);
+                    //l = reg;
+                }
+
+                fprintf(fw, "MOV [R%d], R%d\n", l, r);
+
+                freeReg();
+                freeReg();          //-------------->>>>>>>>>!!!MIGHT NEED TO REMOVE!!!<<<<<<<<<<<<-----------
+                return l; //returning l arbirarily as no use of it
+                break;
+
+            case READ:
+                l = codeGenAuxillary(root->left, fw);
+
+                reg = getFreeReg();
+                fprintf(fw, "MOV R%d, \"Read\"\n", reg);
+                fprintf(fw, "PUSH R%d\n", reg);
+                fprintf(fw, "MOV R%d, -1\n", reg);
+                fprintf(fw, "PUSH R%d\n", reg);
+                //fprintf(fw, "MOV R%d, %d\n", reg, (l - 'a' + 4096));
                 fprintf(fw, "PUSH R%d\n", l);
+                fprintf(fw, "PUSH R%d\n", reg);
+                fprintf(fw, "PUSH R%d\n", reg);
+                fprintf(fw, "CALL 0\n");
+                fprintf(fw, "POP R%d\n", reg);
+                fprintf(fw, "POP R%d\n", reg);
+                fprintf(fw, "POP R%d\n", reg);
+                fprintf(fw, "POP R%d\n", reg);
+                fprintf(fw, "POP R%d\n", reg);
 
-                freeReg();          //----!!! might have to change order with codeGenAux
+                freeReg();
+                freeReg();      //-------------->>>>>>>>>!!!MIGHT NEED TO REMOVE!!!<<<<<<<<<<<<-----------
 
-                codeGenAuxillary(root->right, fw);
+                return l;       //returning l arbirarily as no use of it
+                break;
+
+            case WRITE:
+                l = codeGenAuxillary(root->left, fw);
+
+                if (root->left->nodetype == ID)
+                {
+                    //reg = getFreeReg();
+                    fprintf(fw, "MOV R%d, [R%d]\n", l, l);
+                    //l = reg;
+                }
+
+                reg = getFreeReg();
+                fprintf(fw, "MOV R%d, \"Write\"\n", reg);
+                fprintf(fw, "PUSH R%d\n", reg);
+                fprintf(fw, "MOV R%d, -2\n", reg);
+                fprintf(fw, "PUSH R%d\n", reg);
+                // fprintf(fw, "MOV R%d, R%d", reg, (l-'a'+4096));
+                fprintf(fw, "PUSH R%d\n", l);
+                fprintf(fw, "PUSH R%d\n", reg);
+                fprintf(fw, "PUSH R%d\n", reg);
+                fprintf(fw, "CALL 0\n");
+                fprintf(fw, "POP R%d\n", reg);
+                fprintf(fw, "POP R%d\n", reg);
+                fprintf(fw, "POP R%d\n", reg);
+                fprintf(fw, "POP R%d\n", reg);
+                fprintf(fw, "POP R%d\n", reg);
+
+                freeReg();
+                freeReg();
+                return l; //returning l arbirarily as no use of it
+                break;
+
+            case IF:
+                lbl1 = getLabel();
+                lbl2 = getLabel();
+                l = codeGenAuxillary(root->left, fw);
+                fprintf(fw, "JZ R%d, L%d\n", l, lbl1);
+                r = codeGenAuxillary((root->right)->left, fw);
+                fprintf(fw, "JMP L%d\n", lbl2);
+                fprintf(fw, "L%d:\n", lbl1);
+                if ((root->right)->right != NULL)
+                    r = codeGenAuxillary((root->right)->right, fw);
+                fprintf(fw, "L%d:\n", lbl2);
+
+                freeReg();
+                // freeReg();      //.....>>> MIGHT NEED TO REMOVE <<<<-------------------
+                break;
+
+            case WHILE:
+                lbl1 = getLabel();
+                lbl2 = getLabel();
+                pushLoop();
+                loop_stack[0][loop_stack_count] = lbl1;
+                loop_stack[1][loop_stack_count] = lbl2;
+                fprintf(fw, "L%d:\n", lbl1);
+                l = codeGenAuxillary(root->left, fw);
+                fprintf(fw, "JZ R%d, L%d\n", l, lbl2);
+                r = codeGenAuxillary(root->right, fw);
+                fprintf(fw, "JMP L%d\n", lbl1);
+                fprintf(fw, "L%d:\n", lbl2);
+
+                popLoop();
+                freeReg();
+                break;
+
+            case BREAK:
+                if (loop_stack_count >= 0)
+                    fprintf(fw, "JMP L%d\n", loop_stack[1][loop_stack_count]);
+                break;
+
+            case CONT:
+                if (loop_stack_count >= 0)
+                    fprintf(fw, "JMP L%d\n", loop_stack[0][loop_stack_count]);
+                break;
+
+
+            case ARGLIST:
+
+                if(root != NULL){
+
+                    regCount = 0;       
+
+                    if(root->left != NULL){
+                        l = codeGenAuxillary(root->left, fw);
+                        if (root->left->nodetype == ID)
+                        {
+                            //reg = getFreeReg();
+                            fprintf(fw, "MOV R%d, [R%d]\n", l, l);
+                            //l = reg;
+                        }
+
+                        fprintf(fw, "PUSH R%d\n", l);
+
+                        freeReg();          //----!!! might have to change order with codeGenAux
+                    }
+
+                    codeGenAuxillary(root->right, fw);
+                    
+                    return l;   //no need and useless
+                }
+                break;
+
+
+
+            case FUNCCALL:
+
+                for(i=0; i<regCount; i++)           //-----BACKUP REGS in use in current function-----
+                    fprintf(fw, "PUSH R%d\n", i);
+
+
+                regCountBackup = regCount;          //since all regs used already pushed we can start from R0 to evaluate args
+                // regCount = 0;
+
+                r = codeGenAuxillary(root->right, fw);      //this will push Evaluate and push ARGS 
+                
+                // regCount = regCountBackup;
+
+                regCount = 0;
+                fprintf(fw, "PUSH R0\n");           //pushing empty space for RET
+                fprintf(fw, "CALL F%d\n", root->STptr->binding);
+                
+                regCount = regCountBackup;
+
+                r = getFreeReg();
+
+                fprintf(fw, "POP R%d\n", r);        //poping the RET_VAL
+
+                paramList tmp = root->STptr->param;
+                while(tmp != NULL){
+                    fprintf(fw, "POP R0\n");        //popping the pushed args
+                    tmp = tmp->next;
+                }
+
+                //NOTE we have got an extra REG now and we dont wanna pop that
+                for(i=regCount-2; i>=0; i--)           //-----RESTORE REGS in use in current function-----
+                    fprintf(fw, "POP R%d\n", i);
+
+                return r;
+
+                break;
+
+
+
+            case RETURN:
+                l = codeGenAuxillary(root->left, fw);
+                if (root->left->nodetype == ID)
+                {
+                    //reg = getFreeReg();
+                    fprintf(fw, "MOV R%d, [R%d]\n", l, l);
+                    //l = reg;
+                }
+
+                reg = getFreeReg();
+                fprintf(fw, "MOV R%d, BP\n", reg);
+                fprintf(fw, "SUB R%d, 2\n", reg);
+                fprintf(fw, "MOV [R%d], R%d\n", reg, l);
+                freeReg();
+
+                freeReg();
+                break;
+
+
+            case CONNECTOR:
+                l = codeGenAuxillary(root->left, fw);
+                r = codeGenAuxillary(root->right, fw);
+                return l; //returning l arbirarily as no use of it
+                break;
+
+            default:
+                printf("ERROR....!!! In codeGenAuxillary() switch case...\n");
+                break;
             }
-            break;
-
-
-
-        case FUNCCALL:
-            int i, regCountBackup;
-            for(i=0; i<regCount; i++)           //-----BACKUP REGS in use in current function-----
-                fprintf(fw, "PUSH R%d\n", i);
-
-
-            regCountBackup = regCount;          //since all regs used already pushed we can start from R0 to evaluate args
-            regCount = 0;
-
-            r = codeGenAuxillary(root->right, fw);      //this will push Evaluate and push ARGS 
-            
-            regCount = regCountBackup;
-
-            fprintf(fw, "PUSH R0\n");           //pushing empty space for RET
-            fprintf(fw, "CALL F%d\n", root->STptr->binding);
-            r = getFreeReg();
-
-            fprintf(fw, "POP R%d\n", r);        //poping the RET_VAL
-
-            paramList tmp = root->STptr->param;
-            while(tmp != NULL){
-                fprintf(fw, "POP R0\n");        //popping the pushed args
-                tmp = tmp->next;
-            }
-
-            //NOTE we have got an extra REG now and we dont wanna pop that
-            for(i=regCount-2; i>=0; i--)           //-----RESTORE REGS in use in current function-----
-                fprintf(fw, "POP R%d\n", i);
-
-            break;
-
-
-
-        case RETURN:
-            l = codeGenAuxillary(root->left, fw);
-            if (root->left->nodetype == ID)
-            {
-                //reg = getFreeReg();
-                fprintf(fw, "MOV R%d, [R%d]\n", l, l);
-                //l = reg;
-            }
-            fprintf(fw, "MOV [BP-2], R%d\n", l);
-
-            freeReg();
-            break;
-
-
-        case CONNECTOR:
-            l = codeGenAuxillary(root->left, fw);
-            r = codeGenAuxillary(root->right, fw);
-            return l; //returning l arbirarily as no use of it
-            break;
-
-        default:
-            printf("ERROR....!!! In codeGenAuxillary() switch case...\n");
-            break;
-        }
     }
 
 
 
+    int codeGenInit(FILE* fw)
+    {
+        // int reg;
 
+        //generating header of XEXE file
+        for (int i = 1; i <= 8; i++)
+            if (i == 2)
+                fprintf(fw, "2056\n");
+            else
+                fprintf(fw, "0\n");
+
+        // fprintf(fw, "MOV SP, 4121\n"); //code to initialize stack from 4096 not 4095 cause one location used for storing result of calculation
+        fprintf(fw, "MOV SP, %d\n", binding); //code to initialize stack
+        fprintf(fw, "PUSH R0\n");     //space for return value of "main" function
+        fprintf(fw, "BRKP\n");
+
+
+        fprintf(fw, "CALL F0\n");     //sending control to "main" function first
+
+        // int ret = codeGenAuxillary(root, fw);
+        // //freeReg();                                   //to free the ret reg
+
+        // //Writing code to call EXIT func from library
+        // reg = getFreeReg();
+        // fprintf(fw, "MOV R%d, \"Exit\"\n", reg);
+        // fprintf(fw, "PUSH R%d\n", reg);
+        // fprintf(fw, "PUSH R%d\n", reg);
+        // fprintf(fw, "PUSH R%d\n", reg);
+        // fprintf(fw, "PUSH R%d\n", reg);
+        // fprintf(fw, "PUSH R%d\n", reg);
+        // fprintf(fw, "CALL 0\n");
+        // fprintf(fw, "POP R%d\n", reg);
+        // fprintf(fw, "POP R%d\n", reg);
+        // fprintf(fw, "POP R%d\n", reg);
+        // fprintf(fw, "POP R%d\n", reg);
+        // fprintf(fw, "POP R%d\n", reg);
+        // freeReg();
+
+        // fclose(fw);
+    }
+
+
+    void codeGenFunc(FILE* fw, node root, SymbolTableEntry funcGST){
+
+        if(isInitCodeGenerated == 0){
+            codeGenInit(fw);
+            isInitCodeGenerated = 1;
+        }
+
+        fprintf(fw ,"F%d:\n", funcGST->binding);
+
+        fprintf(fw ,"PUSH BP\n");
+        fprintf(fw ,"MOV BP, SP\n");
+        int paramcount = 0;
+        int local_var_count = 0;
+        paramList tmp;
+        SymbolTableEntry tmp2;
+        tmp = paramHeadPtr;
+        tmp2 = Lsymbol_head;
+
+        while (tmp!=NULL){
+            paramcount++;
+            tmp = tmp->next;
+        }
+        
+        while (tmp2!=NULL){
+            local_var_count++;
+            tmp2 = tmp2->next;
+        }
+
+        local_var_count-=paramcount;
+
+        for(int i=0; i<local_var_count; i++)
+            fprintf(fw, "PUSH R0\n");               
+
+        codeGenAuxillary(root, fw);
+                                  
+        for(int i=0; i<local_var_count; i++)
+            fprintf(fw ,"POP R0\n");
+
+        fprintf(fw ,"POP BP\n");
+
+        if(strcmp("main", funcGST->name) != 0)
+            fprintf(fw ,"RET\n");
+        else{
+            int reg = getFreeReg();
+            fprintf(fw, "MOV R%d, \"Exit\"\n", reg);
+            fprintf(fw, "PUSH R%d\n", reg);
+            fprintf(fw, "PUSH R%d\n", reg);
+            fprintf(fw, "PUSH R%d\n", reg);
+            fprintf(fw, "PUSH R%d\n", reg);
+            fprintf(fw, "PUSH R%d\n", reg);
+            fprintf(fw, "CALL 0\n");
+            fprintf(fw, "POP R%d\n", reg);
+            fprintf(fw, "POP R%d\n", reg);
+            fprintf(fw, "POP R%d\n", reg);
+            fprintf(fw, "POP R%d\n", reg);
+            fprintf(fw, "POP R%d\n", reg);
+            freeReg();   
+        }
+        
+    }
 
 
     char *substr(char *string, int position, int length)        //substr func

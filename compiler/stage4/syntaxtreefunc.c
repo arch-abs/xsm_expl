@@ -167,8 +167,8 @@ node createTree(int val, int type, char *varname, int nodetype, node left, node 
         (tmp->type) = type;          //<<<<<<<<<>>>>>>>>>>!!!!!!!!!! MAY NEED TO CHANGE LATER !!!!!!!!!!<<<<<<<<>>>>>>>>>
         tmp->varname = strdup(varname); //try removing dereferencing and see what happens
         tmp->nodetype = ID;
-        tmp->left = NULL;
-        tmp->right = NULL;
+        tmp->left = left;
+        tmp->right = right;
         tmp->str_val = NULL;
         tmp->GSTptr = NULL;
         break;
@@ -564,7 +564,7 @@ int codeGen(node root)
 
 //4121
 int codeGenAuxillary(node root, FILE *fw)
-{ //written in pre-order form so, l will bw lower and r will be greater REG
+{ //written in pre-order form so, l will be lower and r will be greater REG
     int l, r, reg, lbl1, lbl2;
     char c;
 

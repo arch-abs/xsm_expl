@@ -506,7 +506,7 @@ char *yytext;
     #include <stdlib.h>
     #include "y.tab.h"
     #include "syntaxtreedecl.h"
-    //#include "syntaxtreefunc.c"       //might need to remove
+    // #include "syntaxtreefunc.c"       //might need to remove
 
     //#define YYSTYPE node
 
@@ -2022,5 +2022,6 @@ void yyfree (void * ptr )
 #define YYTABLES_NAME "yytables"
 
 #line 149 "stage5_lex.l"
+
 
 

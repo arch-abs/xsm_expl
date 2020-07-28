@@ -16,8 +16,8 @@ public class Linker{
             int i, j;
 
             HashMap<String, Integer> map = new HashMap<String, Integer>();
-            String pattern = "L[0-9]+:";
-            String pattern2 = "L[0-9]+";
+            String pattern = "[L||F][0-9]+:";
+            String pattern2 = "[L||F][0-9]+";
             java.util.regex.Pattern r = Pattern.compile(pattern);
             java.util.regex.Pattern r2 = Pattern.compile(pattern2);
 

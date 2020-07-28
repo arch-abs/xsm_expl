@@ -3,7 +3,7 @@
     #include <stdlib.h>
     #include "y.tab.h"
     #include "syntaxtreedecl.h"
-    //#include "syntaxtreefunc.c"       //might need to remove
+    // #include "syntaxtreefunc.c"       //might need to remove
 
     //#define YYSTYPE node
 
@@ -147,3 +147,4 @@
         }
 
 %%
+

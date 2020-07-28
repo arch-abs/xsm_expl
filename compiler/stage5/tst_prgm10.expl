@@ -1,0 +1,28 @@
+int main()
+{
+  decl
+   int i, n, arr;
+  enddecl
+
+  begin
+    i=0;
+    read(n);
+    while(i<n) do
+      read(arr);
+      write(arr);
+      i = i+1;
+    endwhile;
+
+    write(arr);
+
+    i=0;
+    write(n);
+    write(i);
+    while(i<n) do
+      write(arr);
+      i = i+1;
+    endwhile;
+
+    return 0;
+  end
+}
